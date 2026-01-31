@@ -41,3 +41,6 @@ This project in my opinion requires training the neural networks on his own musi
 
 Innovation Assessment
 The primary innovation of "Reykjavík Sunburn" is the application of "Latent Jamming" as a workaround for the static nature of most neural audio generation. By embedding multiple custom RAVE and vschaos2 models within Pure Data , he has developed a novel technique for semi-generative improvisation. This contributes to the field by demonstrating that neural audio models can function as high-fidelity, low-latency instruments rather than just offline tools. The project proves that human/AI agency can be shared in a way that preserves the "uncanny" strengths of machine learning while keeping the human's aesthetic sensibilities at the center of the creative process.
+
+https://www.youtube.com/watch?v=IkuzquGec4Y
+https://arxiv.org/abs/2111.05011
