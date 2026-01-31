@@ -25,6 +25,6 @@ Questions
 
 How does RAVE work in practice, and what are its strengths and limitations in sound generation and transformation?
 
-How do deep learning models represent and classify different musical attributes such as timbre, pitch, rhythm, and texture?
+How do deep learning models represent or classify different musical attributes such as timbre, pitch, rhythm, and texture?
 
 At what stages of the music production process is AI most effective in improving creative quality rather than just increasing speed?
