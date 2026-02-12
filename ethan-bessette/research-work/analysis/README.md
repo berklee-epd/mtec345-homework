@@ -173,3 +173,23 @@ In terms of environmental impact, the models were trained and run locally, with 
 None of the techniques were novel; however, the experimentation of creating this piece aligns with the time Stability AI released a new version of Stable Audio, along with a research paper [5]. They were able to reduce the number of parameters in the diffusion-transform portion of the model to improve inference-time efficiency while maintaining genre variance and sound quality [5]. According to the paper, this represents a significant innovation over other audio generation models [5].
 
 One of the limitations of the Stable Audio model is that it wasn't originally created as a timbre-transfer model. The team was able to program a creative workaround, as mentioned above, by using custom audio custom audio for the initial noisy sample xτi during ping-pong sampling [5].
+
+## Bibliography
+
+[1]
+“DADABOTS,” AI for Good, Jun. 05, 2025. https://aiforgood.itu.int/speaker/dadabots/ (accessed Feb. 05, 2026).
+
+[2]
+DADABOTS, “AI Song Contest,” AI Song Contest, 2025. https://www.aisongcontest.com/participants-2025/dadabots (accessed Feb. 05, 2026).
+
+[3]
+Z. Evans, J. D. Parker, C. Carr, Z. Zukowski, J. Taylor, and J. Pons, “Stable Audio Open,” arXiv.org, 2024. https://arxiv.org/abs/2407.14358 (accessed Feb. 05, 2026).
+
+[4]
+“I AM AUDIO,” Amiaudio.io, 2026. https://amiaudio.io/ (accessed Feb. 05, 2026).
+
+[5]
+Z. Novack et al., “Fast Text-to-Audio Generation with Adversarial Post-Training,” arXiv.org, 2025. https://arxiv.org/abs/2505.08175 (accessed Feb. 05, 2026).
+
+[6]
+G. Team and G. Deepmind, “Gemma 3 Technical Report,” Mar. 2025. Available: https://storage.googleapis.com/deepmind-media/gemma/Gemma3Report.pdf
