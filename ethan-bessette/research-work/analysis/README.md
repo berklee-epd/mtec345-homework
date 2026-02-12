@@ -72,29 +72,60 @@ I don't understand it enough to explain what's happening for this technical anal
     Where and why humans intervened
     Include a workflow diagram showing data flow, transformations, and human decision points (use draw.io, Lucidchart, or similar)
     
-They recorded vocals, then used stable audio to generate short samples of the backing track around them. They handpicked ones they liked. Then they used stable audio to put it together into a more whole piece. They used I AM CHOIR to process the vocals. They used a locally run LLM (Gemma3-27b) to extend the lyrics. They used inpainting with stable audio to change certain sections of the song without changing the whole song [2]. They used a human producer Encanti to master the track [2]. This project was a combination of coding, training, prompting, adjusting, and finally human taste through using a producer to shape the final sound.
+They recorded vocals, then used stable audio to generate short samples of the backing track around them. They handpicked ones they liked and used stable audio to refine the assembled piece. They used I AM CHOIR to process the vocals. They used a locally run LLM (Gemma3-27b) to extend the lyrics and for help with prompting Stable Audio. They used inpainting with Stable Audio to change certain sections of the song without changing the whole song [2]. Finally, they used a human producer, Encanti, to master the track [2]. This project was a combination of coding, training, prompting, adjusting, and finally human taste through using a producer to shape the final sound.
+
+![Flowchart](/Figure.png)
+The workflow was a creative process shared between human and AI. There are a number of processes that were ongoing over the course of the project, as shown in the Figure.
+- A1 <=> A2: DADABOTS picked the main lyrical theme and motif, then used Gemma to extend lyrics [2].
+- A1 -> D1: DADABOTS recorded the lyrics into the DAW.
+- B1 <=> B2: DADABOTS also used Gemma to improve the prompts they used for generating audio with Stable Audio across iterations [2].
+- B1 | B2 -> B3: text prompts are used to generate audio in Stable Audio.
+- B3 - B1: the audio generated in Stable Audio is considered, handpicked, and sparks the generation of new prompts to improve the audio. Chosen audio is arranged into the track.
+- C1 <=> C2: DADABOTS used a LoRa (low-rank adaptation) of Stable Audio to train the model on two genres: one of DADABOTS' member's teenage mathcore, and trap. This enabled the model to learn these styles without significant processing and retraining of the entire model. Additionally, DADABOTS applied timbre transfer effects by using custom audio for the initial noisy sample xτi during ping-pong sampling [2,5]. They may also have refined the beat of the song by initializing xτi with a recording having a strong beat [5].
+- D1 <=> D2: DADABOTS used a model called I AM CHOIR to apply timbre transfer effects to their vocals.
+
 
 ## Musical Analysis
 
-### Structure
+Structure, Musical Elements, AI Signature
 
     Form and sections (verse, chorus, bridge, etc.)
     Temporal organization and phrasing
     How structure relates to the AI generation method
-
-### Musical Elements
-
     Harmonic progressions and AI's role in them
     Rhythmic patterns and how they were generated
     Melodic contours and pitch selection
     Timbral characteristics
-
-### AI Signatures
-
     Elements that reveal AI involvement
     Uncanny valley effects (if any)
     Strengths unique to the AI approach
     Limitations compared to traditional production
+    
+### Form
+Intro - chorus - verse - chorus - verse - buildup - climax - chorus - outro
+
+When transitioning between sections, the piece often features sound design and ear candy elements that were likely generated using Stable Audio and arranged and fit into place by the human artists and producer Encanti.
+    
+#### Intro
+Soft intro featuring lead vocals on the main lyrical motif, backed by synth piano textures and a building glitch/pulse on quarter notes.
+
+The intro transitions into the next section with a processed vocal/synth run and an angry scream before the beat drops into a new tonal center.
+
+#### Chorus
+Hard-style with pulsing, heavily distorted/noisy bass, with the lyrical motif repeating on top in a robotic grating tone.
+    - the tone was achieved by processing the vocals using I AM CHOIR
+    - The noisy signal is likely due to generation using 
+
+#### Verse
+The verse features a call and response between the vocals mentioning various objects and concepts, and distorted drums and bass. 
+
+#### Climax
+
+#### Outro
+Features a new genre that DADBOTS named "twinkle trap".
+
+### AI Signature
+Overall, the main AI signature is the somewhat noisy sound, though it fits the style as it sounds like distortion in the context of the piece. Additionally, the piece is heavily form forward: each section is separated by feel and beat change-up. This is an element of the main style of the piece, but it also speaks to AI's limited memory and ability to generate full songs with contrasting sections.
 
 ## Music Critic
 
