@@ -112,10 +112,11 @@ Soft intro featuring lead vocals on the main lyrical motif, backed by synth pian
 
 The intro transitions into the next section with a processed vocal/synth run and an angry scream before the beat drops into a new tonal center.
 
-#### Chorus and 
+#### Chorus
 Hard-style with pulsing, heavily distorted/noisy bass, with the lyrical motif repeating on top in a robotic grating tone.
-    - the tone was achieved by processing the vocals using I AM CHOIR
-    - The noisy signal is likely due to generation using 
+
+- the tone was achieved by processing the vocals using I AM CHOIR
+- The noisy signal is likely due to generation using 
 
 #### Verse
 The verse features a call and response between the vocals mentioning various objects and concepts, and distorted drums and bass. 
@@ -132,7 +133,7 @@ A melodic bass line changes between solfège notes re, ti, and do along with a h
 Features a new genre that DADBOTS named "twinkle trap". As mentioned above, they used a LoRa (low-rank adaptation) of Stable Audio to train the model on two genres: one of DADABOTS' member's teenage mathcore, and trap. This enabled the model to learn these styles without significant processing and retraining of the entire model. It is very melodic and features pleasant harmonies, in contrast with the rest of the piece.
 
 ### AI Signature
-Overall, the main AI signature is the somewhat noisy sound, though it fits the style as it sounds like distortion in the context of the piece. Additionally, the piece is heavily form forward: each section is separated by feel and beat change-up. This is an element of the main style of the piece, but it also speaks to AI's limited memory and ability to generate full songs with contrasting sections.
+Overall, the main AI signature is the somewhat noisy sound, though it fits the style as it sounds like distortion in the context of the piece. Additionally, the piece is heavily form focused: each section is separated by feel and beat change-up. This is an element of the main style of the piece, but it also speaks to AI's limited memory and ability to generate full songs with contrasting sections without human intervention.
 
 ## Music Critic
 
