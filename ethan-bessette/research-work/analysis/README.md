@@ -1,14 +1,5 @@
 # Research Work Phase 1: AI Song Contest Analysis
 
-Submitted in correct directory with correct filename	5
-Song title, artist, year, and summary	10
-Technical Analysis section (complete, sufficient depth)	25
-Musical Analysis section (complete, sufficient depth)	25
-Music Critic section (complete, sufficient depth)	15
-At least one workflow diagram	10
-References section with cited sources	10
-Total	100
-
 ## Song Selection
 | Title | Artist | Year |
 | --- | --- | --- |
@@ -27,12 +18,17 @@ This submission is a genre bending piece with lots of energy that repeats the ph
     Input/output formats and data representations
     Training vs. inference pipeline
     
+| Model | Architecture | Parameters | Training Data | Input Format | Output Format |
+| --- | --- | --- | --- | --- | --- |
+| Custom Stable Audio 2.5 [5] | Diffusion-transformer | Variable: 0.34B - 1.06B [5] | Variable: Audio with CC0, CC-BY, or CC-Sampling+ licenses; Free Music Archive Music; custom audio [2,5] | Audio and Text | Audio |
+| Gemma3-27b [6] | Transformer | 27B | Source unknown; 14T tokens encompassing image, text, mono and multilingual text | Text | Text |
+| I AM CHOIR [4] | Unknown | Unknown | Audio recordings of gospel choir, children's choir, and gang vocals | Audio | Audio |
+
+
 The team primarily used Stable Audio, the model they continue to improve through their research at Stability AI [1,2], which was likely their reason for choosing the model. It is capable of audio-to-audio; in their recent paper, they informally experimented with its style and timbre transfer abilities [5]. It is also capable of text-to-audio [3].
 
-The model can input text to output audio. It can be retrained on new audio by substituting new audio for x0 during the ping-pong ARC post-training [5]. This is what enabled the team to use timbre transfer and inpainting. They were able to make adjustments to the overall song in sections [2].
-
+The team likely used Gemma because it is relatively lightweight and is open sourced.
     
-
 ### Tool Ecosystem
 
     Software and hardware used
@@ -40,7 +36,7 @@ The model can input text to output audio. It can be retrained on new audio by su
     Integration between tools
     Custom code vs. off-the-shelf solutions
 
-There is no information on which machines and operating systems the team used. However, they used the off-the-shelf solution I AM CHOIR [2], which only runs on macOS with Apple Silicon (M1 and later) [4], making it likely they used macOS.
+There is no information on which machines and operating systems the team used. However, they used the off-the-shelf solution I AM CHOIR [2], which only runs on macOS with Apple Silicon (M1 and later) [4], making it likely they used macOS with a Silicon chip.
 
 All the models they used ran on their local machines [2].
 
@@ -48,9 +44,9 @@ As noted, they used their own diffusion-transformer model Stable Audio. They lik
 
 They also used a customized off-the-shelf solution, I AM CHOIR to shape the vocals [2]. The model was trained on a gospel choir, children's choir, and gang vocals [4].
 
-They used an LLM (Gemma3-27b).
+They used an open sourced LLM (Gemma3-27b).
 
-They did use I AM CHOIR models to shape the voices. The various tools were kept separate. The Stable Audio generated the main sections of the background. I AM CHOIR processed the vocals.
+The tools were kept separate; human interaction piped data across models, as explained in the Workflow section.
 
 ### Data Pipeline
 
@@ -59,10 +55,14 @@ They did use I AM CHOIR models to shape the voices. The various tools were kept 
     Feature engineering decisions
     Real-time vs. offline processing
     
-There is a lot of information available about how stable audio works in specific instances, but not on how it's working for the AI song contest. That being said, this is the internal process described for the most recent paper they released, looking at improving the inference speed for the stable audio open text-to-audio model (note that SAO means Stable Audio Open): "Our latent generative models synthesize variable-length (up to 11.89s, with a timing control [4]) stereo audio at 44.1kHz from text. It consists of the pre-trained 156M parameter autoencoder from SAO that compresses waveforms into
-a 64-channel 21.5Hz latent space, a 109M parameter T5 text embedder, and a Diffusion Transformer (DiT) that operates in the latent space."
+    
+| Model | Architecture | Parameters | Purpose | Input Format | Output Format |
+| --- | --- | --- | --- | --- | --- |
+| Customized Stable Audio | Autoencoder | 156M | "compresses waveforms into a manageable sequence length", creating a latent space in which the diffusion-transformer works. It then decodes and upsamples the audio at the end of the process. [3] | Audio | Audio |
+|| T5-based text embedding | 109M | provides text conditioning to the diffuser-transformer so that text prompts can effect the audio output. [3] | Text | Unknown |
+|| Diffusion-transformer | Variable: 0.34B - 1.06B [3,5]| using training data and text input, generate audio | Unknown | Audio |
 
-I don't understand it enough to explain what's happening for this technical analysis. It seems the aim is to make realtime processing more feasible.
+The two papers cited explain the process much more in depth. They also have experimental setup and procedures for reproducing.
     
     
 ### Workflow & Process
@@ -75,6 +75,7 @@ I don't understand it enough to explain what's happening for this technical anal
 They recorded vocals, then used stable audio to generate short samples of the backing track around them. They handpicked ones they liked and used stable audio to refine the assembled piece. They used I AM CHOIR to process the vocals. They used a locally run LLM (Gemma3-27b) to extend the lyrics and for help with prompting Stable Audio. They used inpainting with Stable Audio to change certain sections of the song without changing the whole song [2]. Finally, they used a human producer, Encanti, to master the track [2]. This project was a combination of coding, training, prompting, adjusting, and finally human taste through using a producer to shape the final sound.
 
 ![Flowchart](Figure.png)
+
 The workflow was a creative process shared between human and AI. There are a number of processes that were ongoing over the course of the project, as shown in the Figure.
 - A1 <=> A2: DADABOTS picked the main lyrical theme and motif, then used Gemma to extend lyrics [2].
 - A1 -> D1: DADABOTS recorded the lyrics into the DAW.
@@ -111,7 +112,7 @@ Soft intro featuring lead vocals on the main lyrical motif, backed by synth pian
 
 The intro transitions into the next section with a processed vocal/synth run and an angry scream before the beat drops into a new tonal center.
 
-#### Chorus
+#### Chorus and 
 Hard-style with pulsing, heavily distorted/noisy bass, with the lyrical motif repeating on top in a robotic grating tone.
     - the tone was achieved by processing the vocals using I AM CHOIR
     - The noisy signal is likely due to generation using 
@@ -119,10 +120,16 @@ Hard-style with pulsing, heavily distorted/noisy bass, with the lyrical motif re
 #### Verse
 The verse features a call and response between the vocals mentioning various objects and concepts, and distorted drums and bass. 
 
+#### Buildup / Bridge
+Features the same building glitch/pulse on quarter notes as the intro. It also includes a synth-like melody the changes between two notes. At the end of the section, it features a very simple, high blatty synth melody that arpeggiates a chord that is not the tonal center, before a female-sounding voice says dance and the piece drops into the climax.
+- the simple synth melodic elements that don't nexearily match the key of the song show AI involvement
+- however, this does fit the style/genre of the song
+
 #### Climax
+A melodic bass line changes between solfège notes re, ti, and do along with a heavy beat with snare on 3. It also has a siren-like sound in the background.
 
 #### Outro
-Features a new genre that DADBOTS named "twinkle trap".
+Features a new genre that DADBOTS named "twinkle trap". As mentioned above, they used a LoRa (low-rank adaptation) of Stable Audio to train the model on two genres: one of DADABOTS' member's teenage mathcore, and trap. This enabled the model to learn these styles without significant processing and retraining of the entire model. It is very melodic and features pleasant harmonies, in contrast with the rest of the piece.
 
 ### AI Signature
 Overall, the main AI signature is the somewhat noisy sound, though it fits the style as it sounds like distortion in the context of the piece. Additionally, the piece is heavily form forward: each section is separated by feel and beat change-up. This is an element of the main style of the piece, but it also speaks to AI's limited memory and ability to generate full songs with contrasting sections.
@@ -134,15 +141,35 @@ Overall, the main AI signature is the somewhat noisy sound, though it fits the s
     How does this approach differ from other AI Song Contest entries?
     Trade-offs between automation and control
     Scalability and reproducibility
+    
+Without going into too much detail, this entry differs from many of the other entries because its creators are on the engineering team of the main tool they used. They had access to past research, models, training data, etc, at their company.
+
+It uses human taste and a final human producer to shape the overall sound of the piece. Some entries used machine learning mastering tools. This is an example of the trade-off between automation and control. Other examples include using handpicked snippets of the audio generated by Stable Audio.
+
+Overall, I think this method of production is a great balance between creative coding and composition/production. The team was able to take an original lyrical motif and shape the generation of audio around their vocals in a way that sounds good while still contributing to the field of machine learning.
+
 
 ### Ethics and Aesthetics
 
     Training data sources and copyright considerations
     Attribution and creative ownership
     Environmental impact of computation
+    
+For Stable Audio, the team only used audio with Creative Commons and open sourced licenses, as well as their own audio. 
+
+For the I AM CHOIR model, the choirs are credited and images are available for viewing on the website [4].
+
+For the LLM, Gemma3, I could not find the source of the training data in the technical report [6].
+
+In terms of environmental impact, the models were trained and run locally, with the exception possibly of Gemma3. The team only used the model and did no training of the LLM. It is possible that there was a more significant environmental impact of the trading of that model.
 
 ### Innovation Assessment
 
     Novel techniques or applications
     Workarounds for limitations
     Contribution to the field
+    
+    
+None of the techniques were novel; however, the experimentation of creating this piece aligns with the time Stability AI released a new version of Stable Audio, along with a research paper [5]. They were able to reduce the number of parameters in the diffusion-transform portion of the model to improve inference-time efficiency while maintaining genre variance and sound quality [5]. According to the paper, this represents a significant innovation over other audio generation models [5].
+
+One of the limitations of the Stable Audio model is that it wasn't originally created as a timbre-transfer model. The team was able to program a creative workaround, as mentioned above, by using custom audio custom audio for the initial noisy sample xτi during ping-pong sampling [5].
