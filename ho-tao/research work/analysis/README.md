@@ -50,3 +50,8 @@ Using copyrighted music for training is often labeled as fair use or transformat
 
 ### Innovation Assessment
 WaveGan was introduced 8 years ago in 2018. Although creative and resourceful, this wasn't a particularly new approach to making music (sampling has been around for ages, although I wouldn't be able to name someone else from the top of my head who also does it through AI). However, what stood out to me was how it embraced the glitchy and noisy defects to create something congruent. Most people would try to minimize error and this stood out as very "punk" to me. This also proved that you don't need a massive computer or the latest models to to create something compelling. 
+
+
+## References
+https://www.aisongcontest.com/participants-2022/aiphex-twins
+https://philippstolberg.notion.site/Documentation-Aiphex-Twins-0f3bb3f2ec4740d59edbbba74f42b32a
