@@ -1,0 +1,57 @@
+# Noise to Water - Aiphex Twins (2022)
+
+Aiphex Twins is an AI electronic music project lead by Philipp Stolberg and Edgar Eggert. Philipp is an electronic music producer from Zurich and Edgar uses deeplearning in computational cosmology to find out more about distant galaxies. Both passionate about electronic and ambient music, they met at the Dekmantel music festival and has kept in contact since. 
+
+## Techncial Analysis 
+
+### ML Architecture
+
+The engine for the audio was an adapted version of WaveGAN, a Generative Adversarial Network designed by Chris Donahue to synthesize raw audio waveforms, which is unlike many contemporaries that generate MIDI or spectrograms. For the lyrics, the team utilized a simple LSTM (Long Short-Term Memory) Recurrent Neural Network. Initially, the team experimented with large pre-trained models like GPT-2 and Google Magenta but discarded them in favor of lighter, custom-trained models that offered more stylistic specificity.
+
+The decision to use WaveGAN was driven by a desire for "raw" and "glitchy" aesthetics akin to IDM (Intelligent Dance Music) legends like Aphex Twin, rather than the polished, often generic output of large commercial models. The team explicitly noted that pre-trained models "sounded nothing like the music we liked." The LSTM was chosen for its ability to be trained quickly on a specific subset of textual data, allowing for lyrics that matched the energetic yet abstract atmosphere of the instrumental.
+
+The WaveGAN model ingested raw audio data and outputted one-second audio snippets (raw waveforms). This is a crucial thing to take note of; the model did not output full phrases or melodies, but rather textural building blocks—kicks, synth stabs, and noise bursts. The LSTM processed text data (character or word-level) and outputted text strings for lyrics.
+
+GAN is when two neural networks train to compete against each other to generate more authentic data from a training dataset. One network generates new data by taking an input data sample and modifying it as much as possible, while the other network tries to predict whether the data belongs in the original dataset. This proccess keeps repeating until the predicting network can no longer distinguish fake from the original. They were fed 7 hours of Aphex Twin, 9 hours of Steve Reich and 8 hours of Boards of Canada as well as thousands of kick drums from Truncate and Chris Liebing (DJs). They were also trained between 6000-25000 epochs (an epoch is one full cycle where the algorithm processes every training example in the dataset once)
+
+Lyrics were based on a vanilla LSTM implementation written in PyTorch, the standard version of a RNN (recurrent neural network) architecture designed to solve the problem of "forgetting" information over long sequences. RNN runs a cell state that goes through the entire sequence, where the network then decides whether to add new info, keep what's there or discard it away. There is the input gate which decides what's worth keeping and adding, the forget gate which decides what should be disgarded and the output gate which decides what the hidden state (output of the step) should be based on the filtered version of the current memory. Lyric generation was deprioritized, and the training data being fed was the Music O-Net billboard chart library that included metadata such as lyrics and descriptors. 
+
+### Tool Ecosystem
+
+The primary ML framework consisted of an adapted WaveGan implementation, using a modified open-source code developed by Chris Donahue. This relies heavily on Python.  Initially they used GPT-2 and Google Magenta (off-the-shelf solution), but realized they were incapable of creating what they wanted. Edgar would be in charge of training and batch-inference (generating predictions on a large set of observations all at once), and would pass it to Philip to arrange the snippets into a track through a DAW. WaveGAN is optimized for consumer laptops because it uses convolutions to generate an entire audio clip at once. Unlike other AI models that build sounds piece-by-piece, WaveGAN creates a complete raw waveform instantly, which is much easier for consumer-grade GPUs. The workflow was disjointed: Python scripts generated files, which were then saved to disk and manually imported into the DAW. The AI served as a sample generator. While they started with off-the-shelf solutions (Magenta), the final track relies on custom-trained implementations of open-source code (Chris Donahue’s WaveGAN repository). They didn't invent the architecture, but they didn't use a "press play" commercial web interface either, opting to run and retrain the code themselves.
+
+### Data Pipeline
+
+The audio training data consisted of specific artist discographies to capture a distinct vibe: seven hours of Aphex Twin, nine hours of Steve Reich, and eight hours of Boards of Canada, alongside thousands of techno kick drums. The lyric model was trained on a dataset of 20,000 Billboard chart lyrics, specifically filtered for "energetic and intense" tags while excluding "explicit" content. By forcing the GAN to find a latent space between these styles, a noisy texture was generated. These noises were artifcats of the GAN that many would consider undesirable but were kept as an aesthetic choice.
+
+Latent space is like an imaginary environment where the AI will organize the sound. Imagine a room where Aphex Twin is making drum sounds with a Roland TR-606, Reich is in the corner playing minimalist chords and Boards of Canada are playing synth pads in another. The model when "learning" is memorizing these songs and organizing them in the room based on their sonic features (frequencies), similar sounds are placed together and different sounds are placed further away from each other. There is a space between these three that is the latent space, and the AI will synthesize a sound from scratch based on where in the room it is. So for example if I pick a spot between the 606 and the Piano, instead of playing both at once it tries to construct a sound that is half piano and half drum machine. As you can tell from how it sounds the results are probably very glitchy and weird, and when the dataset consists of these artists that fall into the weirder side of music it becomes even less stable and fluid. What makes this so exciting when composing is through these gaps comes hallucinations, where it might randomly create sounds that sound like neither. 
+
+### Workflow and Proccess 
+
+For the melody, a snippet of Chopin's Nocturne was entered into the MuseNet Model, which can generate up to 4 minutes of musical compositions with 10 instruments. A MIDI file of a piano line was created and put into Google's ToneTransfer, which generated a sax line which was layered with excerpts of the generated piano melody. Unlike WaveGan which tries to generate raw audio, Tonetransfer is a DDSP, which asks a neural network to control a synthesizer. The MIDI is fed in, and it determines the pitch and loudness, and then through manipulating the knobs of the synthesizer creates a Sax sound (in this instance). With their own model they generated WAV files of the drum patterns, but turned to Donahue's WaveNet Demo to export sounds for hihats because their own model was not able to do as well. These clips were then given to Philipp who chose the best ones and arranged in the DAW and lyrics were just there to fit the mood (least effort put into them). From this, we know that a human was responsible for the arrangement, rhythm and progression and the AI was responsible for providing the building blocks by generating sound textures.
+
+
+## Musical Analysis
+
+### Structure
+The song does not follow a traditional structure that uses a verse, chorus, bridge, etc. It is more of a sonic collage that goes in and out between cleaner textures to more dense and rhythmic textures. Since AI only generated 1 second snippets, the structure is human-imposed. There is a feeling of a locked groove because Philip is taking a snippet and duplicating it on the grid of his DAW. 
+### Musical Elements
+For the hi-hats, they entered part of a programmed rhythm line into a concatenative synthesis tool called Mosaic, that basically tries to reconstruct the audio with a predefined sample corpus. Unlike WaveGan which would try to create a random noise and mathematically try to construct a waveform that looks like a hi-hat, Mosaic will take a programmed rhythm line and a library of sources (the sample packs), and rearrange the samples to fit the rhythm. From there, they selected the generation that they liked best and used it as a Hihat element. There is not really a traditional melody.
+### AI Signatures
+WaveGan operates at lower sample rate of 16000 khz. which sounds a lot grainier and lo-fi. This is why in the song you'll hear high frequency hissing and instruments lack sharpness. This cou On the other hand, using AI showed that it can excell in sound design as it created textures that would take a lot more effort to create manually. There's lot of unique sounds as mentioned before that can't be created with existing instruments. The limitation through this approach is that it is unable to generate long term coherence, and the workaround was that it was stitched together.
+
+## Music Critic
+
+### Comparative Analysis
+In comparison to other contestant entries, this project focused on frankensteining a collection of generated WAV files as opposed to focusing on MIDI generation. The "ugliness" of AI was also embraced, whereas many other contestants tried to create more realistic sounding and polished instrumentations.  Since the focus was on aesthetic rather than focused melodic content, there were a lot of glitchy textures and unexpected sounds created unexpectedly. This was controlled through limiting most of the generated audio to one-second snippets, which Philipp had to manually listen to and arrange. This also helped in terms of scaling as the team lacked the hardware to train elaborate models.  
+
+### Ethics and Aesthetics
+Using copyrighted music for training is often labeled as fair use or transformative because the model isn't copying the song, but learning so that it can generate new waveforms. The team was also transparent about where it was being used (AI song contest), and them naming themselves Aiphex Twin made it clear where their inspiration was drawn from. However, commercially this still sits kind of in a grey area. I see this overall as a homage.
+
+### Innovation Assessment
+WaveGan was introduced 8 years ago in 2018. Although creative and resourceful, this wasn't a particularly new approach to making music (sampling has been around for ages, although I wouldn't be able to name someone else from the top of my head who also does it through AI). However, what stood out to me was how it embraced the glitchy and noisy defects to create something congruent. Most people would try to minimize error and this stood out as very "punk" to me. This also proved that you don't need a massive computer or the latest models to to create something compelling. 
+
+
+## References
+https://www.aisongcontest.com/participants-2022/aiphex-twins
+https://philippstolberg.notion.site/Documentation-Aiphex-Twins-0f3bb3f2ec4740d59edbbba74f42b32a
