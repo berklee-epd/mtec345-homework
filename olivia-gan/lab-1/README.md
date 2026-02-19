@@ -33,9 +33,13 @@ At other times, I used ChatGPT for resume suggestions, but it struggled to use c
 ### Observations
 #### Document 2-3 interesting things you learned from classmates during our discussion. What experiences or perspectives stood out to you?
 
+<br> Most classmates are quite open to AI-generated music tools, and most of them have used or experienced tools like Suno for brainstorming and exploring purposes. Another interesting point was that we found that people, whether music professionals or not, often cannot tell the difference between real and AI music. So listeners might be fooled by some so-called songwriter's originality and distracted from real human-made songs.  
+
 <br>
 ### Takeaway
 #### Write one sentence on how this discussion changed or reinforced your perspective on AI in music.
+
+<br> This discussion reinforced my view that AI in music is neither purely a threat nor purely a tool, and that it is a powerful system whose impact depends largely on how intentionally and responsibly we choose to use it.
 
 <br>
 ## 3. Looing Ahead
