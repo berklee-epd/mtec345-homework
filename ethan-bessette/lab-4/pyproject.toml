@@ -8,5 +8,6 @@ dependencies = [
     "ipykernel>=7.2.0",
     "jupyter>=1.1.1",
     "pandas>=3.0.0",
+    "pandas-stubs~=3.0.0",
     "torch==2.8",
 ]

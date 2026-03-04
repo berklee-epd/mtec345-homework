@@ -26,20 +26,22 @@ INPUT_SEQUENCE_LENGTH = 4
 # ---
 # ## Step 1: Load and Prepare the Dataset
 
-# %% Load the data
+# %% Load the data: store the csv in a pandas dataframe, re-save the chords column into lists split around the | character
 df = pd.read_csv("./billboard_numerals_simple.csv")
 df["chords"] = df["chords"].str.split("|")
 print(f"Loaded {len(df)} songs")
 df.head()
 
-# %% Build the vocabulary
+# %% Build the vocabulary: create a new list, if a song contains a list of chords, concatenate them into the new list so that it is a list of all the chords in the dataset from all the songs back to back
 all_chords = []
 for chord_list in df["chords"]:
     if chord_list:
         all_chords.extend(chord_list)
-
+# create a new list CHORDS of all unique chords in ascending order
 CHORDS = sorted(set(all_chords))
+# create a new int VOCABULARY_SIZE the number of unique chords
 VOCABULARY_SIZE = len(CHORDS)
+
 stoi = {chord: i for i, chord in enumerate(CHORDS)}
 
 print(f"Vocabulary ({VOCABULARY_SIZE} chords): {CHORDS}")
