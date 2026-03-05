@@ -1,59 +1,36 @@
-# Midterm Proposal: Neural Audio Synthesis with RAVE
+# Midterm Proposal: Audio Synthesis with RAVE
 
 ## What I Would Like to Do
 
 I want to compose an original song using sounds generated entirely through neural synthesis, split across two tools:
 
-- **RAVE `v2_small`** — trained on a self-collected dataset of ~1,200 drum one-shots, used via command line to **generate percussive and short sound elements** (kicks, hats, snares, textures)
-- **`nn~` ISIS in Max/MSP** — used to **generate long-form textures, pads, and synth elements** by manipulating the latent space interactively in Max
-- **Ableton Live** — all generated elements are imported and assembled into a finished, composed song
+- **RAVE `v2_small`** — trained on a self-collected dataset of ~1,200 drum one-shots, used via command line to generate one shots and 808s (kicks, hats, snares, etc...)
+- **`nn~` ISIS in Max/MSP** — used to **generate long-form textures, pads, and synth elements** by manipulating the latent vector interactively in Max.
+- **Ableton** — all generated elements are imported and assembled into a finished, composed song.
 
-Max is used purely as a **latent manipulation and texture generation tool**, not for live performance. RAVE generation happens offline via the command line. All musical composition happens in Ableton.
+Max is used purely as a **latent control tool**, not for live performance. I will program all other parts and control max with external model. All musical composition happens in Ableton except for the synth/pad..
 
 ---
 
 ## How I Will Do It
 
-### 1. Dataset Preparation (1200 One-Shot Samples)
+### 1. Dataset Preparation (One-Shot Samples)
 
 The training dataset consists of **~1,200 self-collected one-shot percussion samples** spanning kicks, hi-hats, and snare/clap elements. Since RAVE trains on continuous audio rather than individual short clips, the samples need to be sorted, prepared, and looped into long audio files before preprocessing.
 
 #### Step 1 — Sort Samples by Type
-Manually (or via a script) organize the currently mixed/unsorted folder into categories:
-```
-/dataset_raw/
-  /kick/
-  /hat/
-  /snare_clap/
-```
-This lets you control the timbral balance of the training data and build separate looped files per category.
+Organize the currently mixed/unsorted folder into categories:
+
+Control the timbral balance of the training data and build separate looped files per category.
 
 #### Step 2 — Normalize All Samples
-Before looping, normalize each sample to a consistent peak level to avoid volume imbalance in the training data:
-```bash
-conda activate rave
+Before looping, normalize each sample with RX to a consistent peak level to avoid volume imbalance in the training.
 
-# Install ffmpeg if needed
-conda install -c conda-forge ffmpeg
 
-# Normalize all WAVs in a folder to -1 dBFS peak
-for f in /dataset_raw/kick/*.wav; do
-  ffmpeg -i "$f" -af "volume=0dB" /dataset_normalized/kick/"$(basename $f)"
-done
-# Repeat for hat/ and snare_clap/
-```
 
 #### Step 3 — Loop Samples to Build Duration
-~1,200 one-shots likely totals only 5–15 minutes of audio — well below RAVE's recommended **1–3 hours**. Loop each category's samples repeatedly to reach the target duration:
-```bash
-# Example: loop the kick folder's audio 20x to reach ~1 hour
-sox /dataset_normalized/kick/*.wav /dataset_looped/kicks_looped.wav repeat 20
+~1,200 one-shots likely totals only 5–15 minutes of audio so it's way below RAVE's recommended **1–3 hours**. I will try to loop each category's samples repeatedly to reach the target duration:
 
-# Repeat for hats and snare/clap
-sox /dataset_normalized/hat/*.wav /dataset_looped/hats_looped.wav repeat 20
-sox /dataset_normalized/snare_clap/*.wav /dataset_looped/snare_looped.wav repeat 20
-```
-> Install `sox` via: `conda install -c conda-forge sox`
 
 **Target durations per category:**
 
@@ -65,12 +42,7 @@ sox /dataset_normalized/snare_clap/*.wav /dataset_looped/snare_looped.wav repeat
 
 #### Step 4 — Convert to RAVE-Compatible Format
 All files must be **44.1kHz, mono, 16-bit WAV**:
-```bash
-for f in /dataset_looped/*.wav; do
-  ffmpeg -i "$f" -ac 1 -ar 44100 -sample_fmt s16 \
-    /dataset_final/"$(basename $f)"
-done
-```
+Will utilize RX batch processing and fit the all samples.
 
 #### Step 5 — Final Dataset Folder Structure
 ```
@@ -83,7 +55,7 @@ This folder is then passed directly to `rave preprocess` in Step 2.
 
 ### 2. Training the RAVE Model
 
-RAVE uses a **two-stage training procedure**: first representation learning (VAE pre-training), then adversarial fine-tuning. The result is a compressed latent space that can be decoded back into high-quality audio in real time.
+RAVE uses a two-stage training procedure: first representation learning (VAE pre-training), then adversarial fine-tuning. The result is a compressed latent space that can be decoded back into high-quality audio in real time.
 
 #### Step 1 — Set Up Environment with Miniconda3
 ```bash
@@ -102,7 +74,7 @@ conda install pytorch torchaudio -c pytorch
 # Then install acids-rave
 pip install acids-rave
 ```
-> **Note:** Always activate the environment before any RAVE commands: `conda activate rave`
+> activate RAVE: `conda activate rave` please please please!!!!!
 
 #### Step 2 — Preprocess / Build the Dataset
 RAVE requires audio to be preprocessed into a binary database before training:
@@ -113,7 +85,6 @@ rave preprocess \
   --sampling_rate 44100
 ```
 - Input: folder of WAV files (44.1kHz mono recommended)
-- The preprocessor chunks, resamples, and indexes all audio for fast loading during training
 
 #### Step 3 — Train the Model
 ```bash
@@ -182,28 +153,12 @@ rave export \
 
 ### 4. Sound Generation
 
-#### 4a. Percussive Elements — RAVE `v2_small` (Command Line, offline)
-
-The trained RAVE model is used **offline via the command line** to batch-generate drum and percussive audio elements. This is entirely separate from Max — RAVE re-synthesizes audio through the trained model and outputs new WAV files ready to be dropped into Ableton.
-
-```bash
-rave generate /path/to/my_percussion_model.ts \
-  /path/to/input_audio.wav \
-  --out /path/to/output_folder
-```
-
-- Feed various audio sources into the model to get neural re-synthesized percussive outputs
-- Experiment with different inputs to produce a range of kick, hat, snare-like, and hybrid textures
-- All outputs rendered as WAV files (~1,200 one-shot & loop sounds) → imported directly into Ableton as drum elements
-
----
-
-#### 4b. Texture / Pad / Synth Elements — ISIS in Max/MSP (`nn~`)
+Texture / Pad / Synth Elements — ISIS in Max/MSP (`nn~`)
 
 Long-form textures, evolving pads, and synth tones are generated inside **Max/MSP** using the **ISIS model** loaded via `nn~`. The latent space is manipulated interactively to sculpt and morph sounds, then rendered out as audio.
 
-![Max patch reference: mc.nn~ and mcs.nn~ latent decode](max_patch_reference.png)
-*Above: `mc.nn~` with 4 channels (left) and `mcs.nn~` with 8 channels (right) — latent-driven texture generation in Max.*
+![MAX Diagram](max_patch_reference.png)
+
 
 **Approach:**
 - Load ISIS: `nn~ isis decode`
