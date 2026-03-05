@@ -15,11 +15,23 @@ Create a model that estimates synthesizer parameters to create patches that matc
 
 ### PseudoCode
 #### Differentiable synthesizer
-In Csound, I will design an FM synthesizer with 4 oscillators. The oscillators will be cascaded similar to FM8 such that each higher oscillator can modulate itself and everything downstream, but lower oscillators cannot modulate ones above them.
-
+In Csound, I will design an FM synthesizer with 2 audio oscillators, 1 control oscillator, and one noise generator. They will all be able to modulate each other and themselves, like in FM8. Each will have an amplitude envelope.
 ![FM8](./Images/Figure1.png)
+Even with few numbers of oscillators, a large number of sounds can be created. 
+![FM Scream in MAX](./Images/FmScream.mp4)
 
 #### In-domain dataset
+All the differentiable parameters will be randomized and coupled with the synth's resulting audio output.
+
+#### Out of Domain dataset
+Additionally, audio that doesn't have coupled synth parameters will be used.
+
+#### Structure
+
+#### Training
+The datasets will be divided 80-10-10 training validation testing.
+For in domain data, the loss between estimated synth parameters and real will be calculated.
+For all data, the audio spectral loss will be calculated ( 
 
 
 Window of 4 chords, what is most likely next chord?
