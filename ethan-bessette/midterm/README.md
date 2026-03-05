@@ -18,7 +18,7 @@ Create a model that estimates synthesizer parameters to create patches that matc
 In Csound, I will design an FM synthesizer with 2 audio oscillators, 1 control oscillator, and one noise generator. They will all be able to modulate each other and themselves, like in FM8. Each will have an amplitude envelope.
 ![FM8](./Images/Figure1.png)
 Even with few numbers of oscillators, a large number of sounds can be created. 
-![FM Scream in MAX](./Images/FmScream.mp4)
+![FM Scream in MAX](https://drive.google.com/file/d/1FBpwcrP1YOWGa7a5kgqJJ4nyOe9Wz6hr/view?usp=sharing)
 
 #### In-domain dataset
 All the differentiable parameters will be randomized and coupled with the synth's resulting audio output.
