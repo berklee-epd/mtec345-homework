@@ -34,11 +34,14 @@ df.head()
 # %% Build the vocabulary
 all_chords = []
 for chord_list in df["chords"]:
+    
     if chord_list:
         all_chords.extend(chord_list)
+       
 
 CHORDS = sorted(set(all_chords))
 VOCABULARY_SIZE = len(CHORDS)
+print(VOCABULARY_SIZE)
 stoi = {chord: i for i, chord in enumerate(CHORDS)}
 
 print(f"Vocabulary ({VOCABULARY_SIZE} chords): {CHORDS}")
@@ -57,6 +60,7 @@ def encode(chord):
     vector = torch.zeros(VOCABULARY_SIZE)
     vector[index] = 1.0
     return vector
+
 
 
 def decode(vector):
@@ -94,6 +98,7 @@ def create_training_pairs(chord_list, window_size=INPUT_SEQUENCE_LENGTH):
     Input: window_size consecutive chords
     Target: the next chord after the window
     """
+    
     pairs = []
     for i in range(len(chord_list) - window_size):
         input_chords = chord_list[i : i + window_size]
@@ -108,6 +113,7 @@ sample_pairs = create_training_pairs(sample_chords)
 print(f"Song has {len(sample_chords)} chords → {len(sample_pairs)} training pairs")
 print(f"\nFirst 3 pairs:")
 for inp, tgt in sample_pairs[:3]:
+    
     print(f"  {inp} → {tgt}")
 
 # %% Create all training pairs
@@ -149,8 +155,9 @@ print(f"X shape: {X.shape}")  # (num_pairs, INPUT_SEQUENCE_LENGTH * VOCABULARY_S
 print(f"y shape: {y.shape}")  # (num_pairs,)
 
 # %% Split into train and test sets (80/20)
-n_train = int(0.8 * len(X))
+n_train = int(0.75 * len(X))
 indices = torch.randperm(len(X))
+
 
 train_idx = indices[:n_train]
 test_idx = indices[n_train:]
@@ -174,17 +181,25 @@ print(f"Test samples: {len(X_test)}")
 # %%
 INPUT_DIM = INPUT_SEQUENCE_LENGTH * VOCABULARY_SIZE  # 4 * 10 = 40
 HIDDEN_DIM = 16
+HIDDEN_DIM_2 = 32
 
 
 class NextChordPredictor(nn.Module):
     def __init__(self):
         super().__init__()
         self.hidden = nn.Linear(INPUT_DIM, HIDDEN_DIM)
-        self.output = nn.Linear(HIDDEN_DIM, VOCABULARY_SIZE)
+        self.dropout1 = nn.Dropout(p=0.2)
+        self.hidden2 = nn.Linear(HIDDEN_DIM, HIDDEN_DIM_2)
+        self.dropout2 = nn.Dropout(p=0.1)
+        self.output = nn.Linear(HIDDEN_DIM_2, VOCABULARY_SIZE)
 
     def forward(self, x):
         x = self.hidden(x)
         x = torch.relu(x)
+        x = self.dropout1(x)
+        x = self.hidden2(x)
+        x = torch.relu(x)
+        x = self.dropout2(x)
         x = self.output(x)  # Raw logits
         return x
 
@@ -240,7 +255,7 @@ loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
 # %% Training loop
-num_epochs = 50
+num_epochs = 100
 batch_size = 64
 
 for epoch in range(num_epochs):
@@ -361,3 +376,5 @@ for i in range(min(15, len(X_test))):
 # 8. **Predict**: Apply to new chord progressions
 #
 # This is the core workflow for most sequence prediction tasks in deep learning!
+
+# %%
