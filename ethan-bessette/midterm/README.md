@@ -17,7 +17,7 @@ Create a model that estimates synthesizer parameters to create patches that matc
 #### Differentiable synthesizer
 In Csound, I will design an FM synthesizer with 4 oscillators. The oscillators will be cascaded similar to FM8 such that each higher oscillator can modulate itself and everything downstream, but lower oscillators cannot modulate ones above them.
 
-![](/Images/Figure1.png)
+![FM8](/Images/Figure1.png)
 
 #### In-domain dataset
 
