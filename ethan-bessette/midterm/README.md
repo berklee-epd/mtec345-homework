@@ -94,3 +94,7 @@ DDSP
 Create structure of synthesizers and parameters. Randomize parameters, calculate loss, move parameters to minimize loss.
 I could calculate gradient descent of move input towards trained function
 For each audio sample, calculate difference of output to original
+
+
+One hot encoding aligns output with true correct answer in one hot encoding to determine loss.
+So for my model, it should have one output for each changeable synth parameter.
