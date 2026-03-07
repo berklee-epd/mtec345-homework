@@ -9,6 +9,7 @@
 #
 # We'll use the one-hot encoding techniques from the previous notebook
 # (`assignment.py`).
+import random
 
 # %% Setup
 import torch
@@ -77,6 +78,7 @@ def encode_sequence(chords):
 # Test
 print(f"encode('I') = {encode('I')}")
 print(f"encode_sequence(['I', 'IV', 'V', 'I']).shape = {encode_sequence(['I', 'IV', 'V', 'I']).shape}")
+print(f"encode_sequence(['I', 'IV', 'V', 'I']).shape = {encode_sequence(['I', 'IV', 'V', 'I']).unsqueeze(0)}")
 
 # %% [markdown]
 # ---
@@ -210,7 +212,7 @@ def predict_next_chord(input_chords):
         logits = model(x)
         probs = torch.softmax(logits, dim=1)
 
-        # Get top 3 predictions
+        # Get top 4 predictions
         top_probs, top_indices = torch.topk(probs[0], k=4)
 
         return [(CHORDS[idx], prob.item()) for idx, prob in zip(top_indices, top_probs)]
@@ -243,8 +245,8 @@ loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
 # %% Training loop
-num_epochs = 50
-batch_size = 64
+num_epochs = 200
+batch_size = 32
 
 for epoch in range(num_epochs):
     model.train()
@@ -347,6 +349,22 @@ for i in range(min(15, len(X_test))):
 
     print(f"{status} {input_chords} → Predicted: {predicted} ({confidence:.0%}), Actual: {actual}")
 
+# %% Generate a song
+test_progression = ["bVII", "IV", "V", "I"]
+final_progression = test_progression
+for i in range(24):
+    results = predict_next_chord(test_progression)
+    chosen_chord = results[random.randint(1, 3)]
+    chord, probability = chosen_chord
+    test_progression  = test_progression[1:] + [chord]
+    final_progression = final_progression + [chord]
+
+print(f"Final progression")
+for i in range(0, len(final_progression), 4):
+    print(f"  {final_progression[i:i+4]}")
+
+# %%
+torch.save(model,"./next_chord_predictor")
 # %% [markdown]
 # %% [markdown]
 # ---
