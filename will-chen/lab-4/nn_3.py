@@ -15,7 +15,7 @@ import pandas as pd
 
 torch.manual_seed(42)
 
-WINDOW_SIZE = 4
+WINDOW_SIZE = 3
 HIDDEN_DIM = 16
 BATCH_SIZE = 64
 EPOCHS = 10
@@ -145,10 +145,10 @@ def predict_next(chords, top_k=4):
     return [(CHORDS[i], p.item()) for i, p in zip(top_idx, top_probs)]
 
 test_progressions = [
-    ["I",  "IV",  "V",   "I"],
-    ["I",  "V",   "vi",  "IV"],
-    ["i",  "VI",  "VII", "i"],
-    ["V",  "bVII","i",   "ii"],
+    ["I", "IV", "V"],
+    ["I", "V", "vi"],
+    ["i", "VI", "VII"],
+    ["V", "bVII", "i"],
 ]
 
 for prog in test_progressions:
@@ -204,10 +204,10 @@ for i, chord in enumerate(CHORDS):
 # %%
 
 test_progressions = [
-    ["I",  "IV",  "V",   "I"],
-    ["I",  "V",   "vi",  "IV"],
-    ["i",  "VI",  "VII", "i"],
-    ["V",  "bVII","i",   "ii"],
+    ["I", "IV", "V"],
+    ["I", "V", "vi"],
+    ["i", "VI", "VII"],
+    ["V", "bVII", "i"],
 ]
 
 print("Predictions after training:\n")
@@ -218,7 +218,7 @@ for prog in test_progressions:
 
 
 # %% Generate a song
-test_progression = ["iv", "IV", "V", "I"]
+test_progression = ["iv", "IV", "V",]
 final_progression = test_progression
 for i in range(12):
     results = predict_next(test_progression)
@@ -228,7 +228,7 @@ for i in range(12):
     final_progression = final_progression + [chord]
 
 print(f"Final progression")
-for i in range(0, len(final_progression), 4):
-    print(f"  {final_progression[i:i+4]}")
+for i in range(0, len(final_progression), 3):
+    print(f"  {final_progression[i:i+3]}")
 
 # %%
