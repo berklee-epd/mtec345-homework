@@ -98,3 +98,10 @@ For each audio sample, calculate difference of output to original
 
 One hot encoding aligns output with true correct answer in one hot encoding to determine loss.
 So for my model, it should have one output for each changeable synth parameter.
+
+
+## The Process
+
+### Dataset creation
+First, I created a csound file that outputs 32 bit wave files at each of n notes through the same synthesizer, naming them the midi note along with eventually the instance. For example, at this commit, running the file from the terminal results in 12 wave files being created called "template_{midinn}.wav" where midinn is the midi note number from 61 to 72.
+
