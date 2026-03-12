@@ -1,0 +1,44 @@
+======= TABLE 196 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 196
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.684962
+0.569676
+0.355458
+0.659722
+0.895586
+0.884598
+0.720467
+0.331267
+0.096730
+0.248213
+0.297401
+0.508741
+0.899579
+0.307686
+0.598413
+0.400071
+0.386340
+0.000000
+---------END OF TABLE---------------

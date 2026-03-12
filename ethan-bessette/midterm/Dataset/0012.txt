@@ -1,0 +1,44 @@
+======= TABLE 113 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 113
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.346743
+0.736354
+0.014525
+0.538865
+0.091176
+0.659819
+0.905801
+0.966914
+0.441621
+0.788404
+0.528996
+0.045491
+0.819681
+0.842704
+0.281914
+0.867915
+0.952995
+0.000000
+---------END OF TABLE---------------

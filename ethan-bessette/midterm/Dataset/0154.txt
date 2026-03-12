@@ -1,0 +1,44 @@
+======= TABLE 255 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 255
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.978247
+0.642357
+0.055806
+0.912516
+0.678367
+0.870953
+0.274907
+0.125595
+0.306392
+0.461307
+0.874081
+0.606231
+0.228323
+0.190132
+0.143886
+0.244337
+0.886729
+0.000000
+---------END OF TABLE---------------

@@ -1,0 +1,44 @@
+======= TABLE 285 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 285
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.944225
+0.037832
+0.008188
+0.867531
+0.912314
+0.656889
+0.595384
+0.079128
+0.383322
+0.611776
+0.815838
+0.435563
+0.146632
+0.535269
+0.710193
+0.242803
+0.724286
+0.000000
+---------END OF TABLE---------------

@@ -1,0 +1,44 @@
+======= TABLE 204 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 204
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.399520
+0.327950
+0.745295
+0.961746
+0.894129
+0.730321
+0.375282
+0.759979
+0.517490
+0.826460
+0.561002
+0.436439
+0.239449
+0.368945
+0.088643
+0.391477
+0.475766
+0.000000
+---------END OF TABLE---------------

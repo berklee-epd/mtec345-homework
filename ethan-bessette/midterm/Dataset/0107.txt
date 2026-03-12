@@ -1,0 +1,44 @@
+======= TABLE 208 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 208
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.974846
+0.282011
+0.878184
+0.040992
+0.343032
+0.343219
+0.362973
+0.455926
+0.303949
+0.202472
+0.451320
+0.816014
+0.454220
+0.123260
+0.059004
+0.251263
+0.620613
+0.000000
+---------END OF TABLE---------------
