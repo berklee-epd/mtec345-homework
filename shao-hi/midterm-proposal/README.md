@@ -2,13 +2,12 @@
 
 ## What I Would Like to Do
 
-I want to compose an original song using sounds generated entirely through neural synthesis, split across two tools:
+I want to compose a song using sounds generated entirely through neural synthesis, split across two tools:
 
 - **RAVE `v2_small`** — trained on a self-collected dataset of ~1,200 drum one-shots, used via command line to generate one shots and 808s (kicks, hats, snares, etc...)
 - **`nn~` ISIS in Max/MSP** — used to **generate long-form textures, pads, and synth elements** by manipulating the latent vector interactively in Max.
 - **Ableton** — all generated elements are imported and assembled into a finished, composed song.
-
-Max is used purely as a **latent control tool**, not for live performance. I will program all other parts and control max with external model. All musical composition happens in Ableton except for the synth/pad..
+- **Max** is used as a **latent control tool**. I will program all other parts and control max with external model. All musical composition happens in Ableton except for the synth/pad..
 
 ---
 
@@ -19,39 +18,29 @@ Max is used purely as a **latent control tool**, not for live performance. I wil
 The training dataset consists of **~1,200 self-collected one-shot percussion samples** spanning kicks, hi-hats, and snare/clap elements. Since RAVE trains on continuous audio rather than individual short clips, the samples need to be sorted, prepared, and looped into long audio files before preprocessing.
 
 #### Step 1 — Sort Samples by Type
-Organize the currently mixed/unsorted folder into categories:
+Organize samples into categories:
 
 Control the timbral balance of the training data and build separate looped files per category.
 
 #### Step 2 — Normalize All Samples
-Before looping, normalize each sample with RX to a consistent peak level to avoid volume imbalance in the training.
+Before looping, normalize each sample with RX to a consistent peak level to avoid volume imbalance in the training.**(ffmpeg)**
 
 
 
 #### Step 3 — Loop Samples to Build Duration
 ~1,200 one-shots likely totals only 5–15 minutes of audio so it's way below RAVE's recommended **1–3 hours**. I will try to loop each category's samples repeatedly to reach the target duration:
 
-
-**Target durations per category:**
-
-| Category | Est. raw duration | Loop target |
-|---|---|---|
-| Kick | ~2–4 min | ~60 min |
-| Hi-Hat | ~2–4 min | ~60 min |
-| Snare/Clap | ~2–4 min | ~60 min |
-
 #### Step 4 — Convert to RAVE-Compatible Format
 All files must be **44.1kHz, mono, 16-bit WAV**:
 Will utilize RX batch processing and fit the all samples.
 
-#### Step 5 — Final Dataset Folder Structure
+#### Step 5 — Final Structure
 ```
 /dataset_final/
   kicks_looped.wav      # ~1 hour
   hats_looped.wav       # ~1 hour
   snare_looped.wav      # ~1 hour
 ```
-This folder is then passed directly to `rave preprocess` in Step 2.
 
 ### 2. Training the RAVE Model
 
@@ -59,12 +48,12 @@ RAVE uses a two-stage training procedure: first representation learning (VAE pre
 
 #### Step 1 — Set Up Environment with Miniconda3
 ```bash
-# Download and install Miniconda3 (if not already installed)
+# Download and install Miniconda3 
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh
 bash Miniconda3-latest-MacOSX-arm64.sh
 # Restart terminal after installation, then:
 
-# Create a dedicated conda environment for RAVE
+# conda environment 
 conda create -n rave python=3.9
 conda activate rave
 
@@ -95,16 +84,12 @@ rave train \
   --name my_percussion_model
 ```
 - `--config v2_small` uses a lighter version of the RAVE v2 architecture — fewer parameters, faster training, and lower CPU load in real time inside Max. Ideal for percussive material and laptop performance
-- Other available configs for reference: `v1`, `v2`, `percussion`, `melodic` — but `v2_small` is the best fit here
 - Training runs in **two phases automatically**:
   - **Phase 1 – Representation Learning** (~1.5M steps): the VAE encoder/decoder learns to compress and reconstruct audio
   - **Phase 2 – Adversarial Fine-tuning** (~1.5M steps): a discriminator sharpens audio quality and realism
 - Full training on a single GPU (e.g. NVIDIA Titan V) can take **~6 days** for 3M steps
 - For a usable draft model, results often emerge after ~300k–500k steps (~hours on a good GPU)
-- Monitor progress with TensorBoard:
-  ```bash
-  tensorboard --logdir /path/to/training/output
-  ```
+
 
 #### Step 4 — Monitor Training with TensorBoard
 Track loss curves and audio reconstruction quality in real time while the model trains:
@@ -125,11 +110,11 @@ rave export \
   --streaming True \
   --fidelity 0.0–1.0
 ```
-- `--run` — path to your dataset/training folder
+- `--run` — path to dataset/training folder
 - `--name` — name for the exported model file
 - `--output .` — exports to the current directory
 - `--streaming True` — enables real-time buffer-based streaming, required for use in Max/MSP
-- `--fidelity` — float between `0.0` and `1.0`; controls the trade-off between reconstruction accuracy and latent space compactness (higher = more faithful to input, lower = more compressed and malleable)
+- `--fidelity` — float between `0.0` and `1.0`; controls the trade-off between reconstruction accuracy and latent space compactness.
 - Output: a `.ts` (TorchScript) file — place this in a folder accessible via Max's file preferences
 
 #### GPU / Cloud Options
@@ -154,16 +139,19 @@ rave export \
 ### 4. Sound Generation
 
 Texture / Pad / Synth Elements — ISIS in Max/MSP (`nn~`)
+Pretrained model for nn are torchscript files, with a .ts extension. we can add these files to nn_tilde/models folders, or any place accessible through Max / Pd filesystem (Max: Options/File Preferences).
 
-Long-form textures, evolving pads, and synth tones are generated inside **Max/MSP** using the **ISIS model** loaded via `nn~`. The latent space is manipulated interactively to sculpt and morph sounds, then rendered out as audio.
+New : since v1.6.0, some models are directly downloadable through IRCAM Forum API.
 
-![MAX Diagram](max_patch_reference.png)
+
+![MAX Diagram](max_synth.png)
 
 
 **Approach:**
 - Load ISIS: `nn~ isis decode`
 - Drive latent dimensions with LFOs, envelopes, and manual controls to shape evolving textures and pads
-- Record the Max output as WAV stems — these become the atmospheric and harmonic layers in Ableton
+- Record the Max output as WAV stems — these become layers in Ableton.
+- use pretrained models (https://acids-ircam.github.io/rave_models_download)
 
 **Reference:** [IRCAM Forum – Neural Synthesis in Max 8 with RAVE](https://forum.ircam.fr/article/detail/tutorial-neural-synthesis-in-max-8-with-rave/) · [YouTube – Neural Synthesis Demo](https://www.youtube.com/watch?v=o09BSf9zP-0)
 
@@ -183,6 +171,7 @@ The final deliverable is a completed, mixed song built entirely from neural audi
 - How large does my dataset need to be?
 - What are the recommended training durations / GPU requirements for a usable model?
 - Can I use a pre-trained RAVE model as a starting point and fine-tune on my own data?
+- Dataset organization?
 
 ### Concerns
 - **Training time**: RAVE models can take many hours to days to train. This may need access to a GPU (e.g., via Google Colab or a cloud service)
