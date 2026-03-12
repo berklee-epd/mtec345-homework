@@ -1,0 +1,44 @@
+======= TABLE 251 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 251
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.485646
+0.452787
+0.971469
+0.924193
+0.915450
+0.989190
+0.801747
+0.942644
+0.870252
+0.200622
+0.255265
+0.044563
+0.721332
+0.423012
+0.816891
+0.547191
+0.973207
+0.000000
+---------END OF TABLE---------------

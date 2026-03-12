@@ -1,0 +1,44 @@
+======= TABLE 201 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 201
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.106728
+0.307464
+0.574871
+0.905827
+0.969669
+0.733474
+0.709319
+0.150195
+0.912751
+0.703217
+0.503713
+0.366867
+0.868467
+0.011435
+0.211499
+0.407703
+0.194858
+0.000000
+---------END OF TABLE---------------

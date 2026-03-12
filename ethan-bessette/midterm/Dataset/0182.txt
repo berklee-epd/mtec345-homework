@@ -1,0 +1,44 @@
+======= TABLE 283 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 283
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.988415
+0.719634
+0.243111
+0.756843
+0.185297
+0.631623
+0.918532
+0.315759
+0.453678
+0.065844
+0.975946
+0.398580
+0.228388
+0.197014
+0.873083
+0.500552
+0.031933
+0.000000
+---------END OF TABLE---------------

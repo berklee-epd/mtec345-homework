@@ -1,0 +1,44 @@
+======= TABLE 168 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 168
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.636589
+0.444726
+0.117350
+0.432916
+0.866130
+0.763858
+0.928505
+0.372280
+0.441999
+0.828513
+0.778485
+0.478199
+0.663720
+0.319144
+0.812341
+0.065100
+0.897148
+0.000000
+---------END OF TABLE---------------

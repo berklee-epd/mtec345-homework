@@ -1,0 +1,44 @@
+======= TABLE 176 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 176
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.561386
+0.477167
+0.554371
+0.733901
+0.754602
+0.947770
+0.413411
+0.799646
+0.720103
+0.292716
+0.012400
+0.313699
+0.235513
+0.951905
+0.851446
+0.208190
+0.057060
+0.000000
+---------END OF TABLE---------------

@@ -1,0 +1,44 @@
+======= TABLE 185 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 185
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.381006
+0.366442
+0.823442
+0.241173
+0.551588
+0.439127
+0.524191
+0.536439
+0.834127
+0.373266
+0.546402
+0.889604
+0.250899
+0.581949
+0.655707
+0.470195
+0.815708
+0.000000
+---------END OF TABLE---------------
