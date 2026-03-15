@@ -122,3 +122,37 @@ While the data is generating, I'm checking my activity monitor and it looks like
     - Update, yes, this is the case. If I were to keep the note 5 seconds, that means I can only uses 5 instruments at a time. To generate 1000 sets of synth parameters, it would take 200 seconds to generate the dataset. Honestly that's reasonable, I'll keep it how it is for now. Nevermind 200 seconds only generates 200 examples. Def something I need to fix.
 
 
+#### DDSP
+Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters e2e differentiable.
+
+##### Original DDSP Library
+1. Preprocess raw audio
+    - detect fundamental frequency and loudness over time for 5 second clips of audio, store in a TFRecord file
+2. Save dataset stats so that future inputs can be processed to match training data
+    - pitch (f0), power, loudness, quantile transform.
+3. 
+
+
+
+##### My Implementation
+
+
+1. Break training audio into Mel spectrogram at time points
+
+
+2. Given spectrogram,
+3. estimate synth parameters
+4. process audio tensor from those parameters, convert to Mel spectrogram
+5. Find loss between output and training Mel spectrogram
+6. Find loss between estimated and real synth parameters
+
+Flow of DDSP library:
+- preprocess raw audio into dataset
+    - detects 
+
+
+1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
+2. Uses those in additive to create pitched part of input
+3. Uses noise and filter to create unpatched
+4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio, 
+
