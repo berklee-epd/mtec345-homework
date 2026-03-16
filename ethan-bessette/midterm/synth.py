@@ -34,6 +34,10 @@ def linear_lookup(phase: float, wavetable: torch.Tensor):
 
 #%%
 def fm_bank(base_freq: int, ratio1: float, ratio2: float, i1index2: float, i2index1: float, iout1: float, iout2: float, adsr1: torch.Tensor, adsr2: torch.Tensor, wavetable: torch.Tensor, num_samples: int, sample_rate: int):
+    ratio1 = ratio1 * 16
+    i1index2 = i1index2 * 14.5
+    i2index1 = i2index1 * 14.5
+
     a1 = torch.zeros((num_samples))
     a2 = torch.zeros((num_samples))
     phase1 = 0
