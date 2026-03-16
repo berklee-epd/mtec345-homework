@@ -6,6 +6,7 @@ import io
 import base64
 import sounddevice as sd
 import numpy as np
+from numpy.random import random as rnd
 import matplotlib.pyplot as plt
 from IPython import display
 from scipy.io import wavfile
@@ -123,29 +124,37 @@ def specplot(audio, sample_rate=48000, vmin=-5, vmax=1, rotate=True, size=768):
     plt.tight_layout()
     plt.show()
 
- #%%
-adstr = torch.tensor([1.234,0.456,0.789, 0.285])
-sustain_level = 0.7
 
-adstr2 = torch.tensor([0.3, 1.452, 0.842, 0.239])
-sustain_level2 = 0.5
+ #%%
+i1ratio = rnd(1)
+i1index1 = rnd(1)
+i1index2 = rnd(1)
+i2index2 = rnd(1)
+i2index1  = rnd(1)
+i1out = rnd(1)
+i2out = rnd(1)
+iattack1 = rnd(1)
+idecay1 = rnd(1)
+isustaintime1 = rnd(1)
+isustain1 = rnd(1)
+irelease1 = rnd(1)
+iattack2 = rnd(1)
+idecay2 = rnd(1)
+isustaintime2 = rnd(1)
+isustain2 = rnd(1)
+irelease2 = rnd(1)
 
 #%%
-k1 = synth.adsr(adstr[0], adstr[1], adstr[2], adstr[3], sustain_level, num_samples, sample_rate)
-k2 = synth.adsr(adstr2[0], adstr2[1], adstr2[2], adstr2[3], sustain_level2, num_samples, sample_rate)
+k1 = synth.adsr(iattack1[0], idecay1[0], isustaintime1[0], irelease1[0], isustain1[0], num_samples, sample_rate)
+k2 = synth.adsr(iattack2[0], idecay2[0], isustaintime2[0], irelease2[0], isustain2[0], num_samples, sample_rate)
 show_waveform(k1, k2)
 
 #%%
 wavetable = torch.sin(torch.linspace(0, 2*np.pi, wavetable_samples))
 show_waveform(wavetable)
-#%%
-frequency_envelope = torch.linspace(440, 440, num_samples)
-phase_velocity = frequency_envelope / float(sample_rate)  # cycles / sample
-phase = torch.cumsum(phase_velocity, dim=0, dtype=torch.float32) % 1.0
-show_waveform(phase[:1000])
 
 #%%
-audio = synth.fm_bank(220,1.0,1.0,10.471,12,0,1,k1,k2,wavetable,num_samples,sample_rate)
+audio = synth.fm_bank(220,i1ratio[0],1.0,i1index2[0],i2index1[0],i1out[0],i2out[0],k1,k2,wavetable,num_samples,sample_rate)
 show_waveform(audio)
 specplot(audio)
 play_audio(audio, sample_rate)
