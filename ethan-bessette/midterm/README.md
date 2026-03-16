@@ -103,6 +103,8 @@ So for my model, it should have one output for each changeable synth parameter.
 ## The Process
 
 ### Dataset creation
+
+#### Csound
 I created a csound file that outputs 32 floating point wave files at each of 12 notes through the same synthesizer, naming them the index of the synth along with the note number. Outputting results in a dataset being generated that contains sets of 12 notes for each set of random synth parameters along with text files holding the synth parameters. As of now, I haven't found a way to output only the synth parameters, so the text file contains a header that will need to be discarded when cleaning data for machine learning training.
 
 There is an encode.csd file that generates parameters and creates audio for them, as well as a decode.csd that reads parameters and generates data. I tested them and it works. I also tested them on my own new parameters that I changed by hand.
@@ -111,7 +113,7 @@ The next step will be figuring out how to get the .csd to run in the correct ord
 
 While the data is generating, I'm checking my activity monitor and it looks like processing is kept to 1 processor. I wonder if I could figure out multi threading to make it faster as well as forcing csound to make new instances instead of reusing them.
 
-#### Problems
+##### Problems
 1. One problem was figuring out how to keep the pitch relatively constant during self modulation. When an oscillator self modulates its frequency, the pitch is perceived as lowering as the sidebands to the positive and negative are created. I researched ways to keep this constant and first kind Bessel functions were what came up. I tried to ask ChatGPT to help write functions to keep the pitch normal by calculating the spectral center as a function of f0 and self modulation index, but when I tried to implement it in Csound, it was too computationally expensive and sound froze every time. I spent a while finding a workaround and I ended up using a realtime polynomial function to approximate the amount of frequency offset within the range of parameters that I was using. It stops working at a certain point, but that doesn't matter since the way I programmed the synth it will never generate parameters outside that range. I also realized that a small amount of modulation by the original frequency helped to stabilize the pitch. I slightly modulate the frequency of the oscillator with a separate oscillator at its original frequency as a function of self-modulation index. While it adds some harmonics not present in true self-modulation, it doesn't matter.
 
 2. Another problem was figuring out how to keep the parameters constant while generating 12 different pitches of the same parameters. I ended up using two different scheduler instruments to do this. One scheduler spawns instances of the other scheduler so that synth sets can be generated in parallel. The other scheduler spawns 12 parallel instances of one set of parameters at different pitches. The instances themselves output the audio data, while the second scheduler holds the generated parameters and outputs them when done.
@@ -120,6 +122,22 @@ While the data is generating, I'm checking my activity monitor and it looks like
 
 4. It turns out Csound re-uses instances of instruments to save storage in memory. This was causing a problem where two clips were combined in one in the output audio. To solve this, I made sure to offset the parent scheduler so that it never created secondary schedulers at the same time. Note to self, I bet if I use more primary schedulers than the note length, I might have to change this so that it instantiates notes with a new identity instead of simply offsetting.
     - Update, yes, this is the case. If I were to keep the note 5 seconds, that means I can only uses 5 instruments at a time. To generate 1000 sets of synth parameters, it would take 200 seconds to generate the dataset. Honestly that's reasonable, I'll keep it how it is for now. Nevermind 200 seconds only generates 200 examples. Def something I need to fix.
+
+5. The biggest problem is that I didn't understand that for ddsp to work, the synth has to be implemented in PyTorch.
+
+#### PyTorch
+I referenced the ddsp core.py library.
+
+I created a linear interpolation wavetable lookup function that takes in an index and returns an amplitude value based on the wavetable.
+
+I created an adsr generator that generates envelopes based on attack time, decay time, sustain time, sustain level, and release time. The time based parameters are loaded into a tensor, and softmax is applied so that the total time sums to one. Each value is then multiplied by the total number of samples to get the total time.
+
+I created an FM bank generator. Currently, it inits 2 audio tensors with zeros the length of total samples. It sets the phase of both to zero. Then, it works sample by sample:
+- calculate frequency from base frequency, ratios, previous audio tensor amplitude values, indexes
+- make the current audio sample equal the table lookup for the current phase
+- update the phase by adding its acceleration (it will always increase and wrap around 1. A higher frequency means the phase gets to 1 quicker / in larger steps. A lower frequency means it gets there in shorter steps)
+- output the audio with the values of out 1 and 2 scaled to sum to 1 to avoid clipping.
+It currently implements only modulating the other audio wave, no self modulation.
 
 
 #### DDSP
@@ -137,7 +155,9 @@ Includes tensor operations that create audio synthesis as part of the machine le
 ##### My Implementation
 
 
-1. Break training audio into Mel spectrogram at time points
+1. Break training audio into Mel spectrogram at time points, store in a data frame
+2. Save dateset stats
+3. 
 
 
 2. Given spectrogram,
