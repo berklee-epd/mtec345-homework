@@ -1,0 +1,44 @@
+======= TABLE 172 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 172
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.990723
+0.964089
+0.142348
+0.081348
+0.618581
+0.536844
+0.876991
+0.914591
+0.898155
+0.156775
+0.609884
+0.615396
+0.199380
+0.123688
+0.104422
+0.063212
+0.697137
+0.000000
+---------END OF TABLE---------------

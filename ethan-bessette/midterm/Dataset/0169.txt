@@ -1,0 +1,44 @@
+======= TABLE 270 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 270
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.397199
+0.082075
+0.695567
+0.693216
+0.444181
+0.059593
+0.313708
+0.236419
+0.047907
+0.075599
+0.009500
+0.006462
+0.684651
+0.536707
+0.862448
+0.373827
+0.605888
+0.000000
+---------END OF TABLE---------------

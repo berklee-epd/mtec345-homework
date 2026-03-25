@@ -1,0 +1,44 @@
+======= TABLE 105 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 105
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.974532
+0.248741
+0.353327
+0.433979
+0.978771
+0.697847
+0.934824
+0.041771
+0.425545
+0.085200
+0.026638
+0.822235
+0.113312
+0.005053
+0.535368
+0.720665
+0.352265
+0.000000
+---------END OF TABLE---------------

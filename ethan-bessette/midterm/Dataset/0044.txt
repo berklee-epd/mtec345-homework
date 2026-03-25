@@ -1,0 +1,44 @@
+======= TABLE 145 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 145
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.509830
+0.014947
+0.583641
+0.835019
+0.467778
+0.559658
+0.294135
+0.162727
+0.240472
+0.477322
+0.570807
+0.475339
+0.360700
+0.215091
+0.788259
+0.513693
+0.424254
+0.000000
+---------END OF TABLE---------------
