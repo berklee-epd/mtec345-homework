@@ -1,0 +1,44 @@
+======= TABLE 130 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 130
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.609825
+0.609139
+0.536433
+0.833437
+0.300188
+0.804062
+0.187905
+0.907921
+0.191489
+0.287703
+0.481297
+0.991999
+0.099342
+0.524987
+0.620747
+0.766244
+0.181206
+0.000000
+---------END OF TABLE---------------

@@ -1,0 +1,44 @@
+======= TABLE 227 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 227
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.621550
+0.851306
+0.193341
+0.483917
+0.269519
+0.554705
+0.769331
+0.508314
+0.854349
+0.515756
+0.642783
+0.100914
+0.691583
+0.271129
+0.725303
+0.843684
+0.385780
+0.000000
+---------END OF TABLE---------------

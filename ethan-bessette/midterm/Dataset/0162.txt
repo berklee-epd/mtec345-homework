@@ -1,0 +1,44 @@
+======= TABLE 263 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 263
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.947952
+0.432700
+0.843215
+0.336142
+0.613206
+0.967331
+0.485833
+0.472534
+0.063551
+0.732993
+0.658385
+0.753936
+0.877300
+0.947278
+0.361211
+0.269175
+0.518318
+0.000000
+---------END OF TABLE---------------

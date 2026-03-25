@@ -1,0 +1,44 @@
+======= TABLE 123 size: 17 values ======
+flen: 17
+lenmask: -1
+lobits: 0
+lomask: 0
+lodiv: 1.000000
+cvtbas: 0.000000
+cpscvt: 0.000000
+loopmode1: 0
+loopmode2: 0
+begin1: 0
+end1: 0
+begin2: 0
+end2: 0
+soundend: 0
+flenfrms: 17
+nchnls: 1
+fno: 123
+gen01args.gen01: 0.000000
+gen01args.ifilno: 0.000000
+gen01args.iskptim: 0.000000
+gen01args.iformat: 0.000000
+gen01args.channel: 0.000000
+gen01args.sample_rate: 48000.000000
+---------END OF HEADER--------------
+0.463611
+0.118247
+0.527966
+0.936455
+0.214647
+0.741258
+0.534104
+0.586745
+0.163903
+0.365082
+0.679373
+0.977557
+0.569225
+0.307690
+0.598793
+0.440331
+0.651787
+0.000000
+---------END OF TABLE---------------
