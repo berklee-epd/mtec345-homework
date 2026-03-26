@@ -45,6 +45,9 @@ I switched to processing the audio locally instead. Running FFmpeg locally was s
 **Colab session**
 https://colab.research.google.com/drive/10skxqjZcSClpmxpv1XTcMoN4_ZhOLhQp?usp=sharing
 
+**Model**
+https://drive.google.com/file/d/1JRaEooBHzX-tBK4V1pc-XGN1aObXlr8j/view?usp=sharing
+
 ### RAVE — The Model Architecture
 
 RAVE (Realtime Audio Variational autoEncoder) is a deep learning architecture developed at IRCAM by Antoine Caillon and Philippe Esling. It is a variational autoencoder, meaning it has two main components:
