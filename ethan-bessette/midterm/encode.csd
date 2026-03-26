@@ -254,6 +254,8 @@ e 99999
 
 
 
+
+
 <bsbPanel>
  <label>Widgets</label>
  <objectName/>
@@ -268,7 +270,7 @@ e 99999
   <g>240</g>
   <b>240</b>
  </bgcolor>
- <bsbObject version="2" type="BSBScope">
+ <bsbObject type="BSBScope" version="2">
   <objectName/>
   <x>20</x>
   <y>85</y>
@@ -288,7 +290,7 @@ e 99999
   <mode>0.00000000</mode>
   <triggermode>NoTrigger</triggermode>
  </bsbObject>
- <bsbObject version="2" type="BSBGraph">
+ <bsbObject type="BSBGraph" version="2">
   <objectName/>
   <x>17</x>
   <y>267</y>

@@ -1,0 +1,3956 @@
+Chat 'ChatTitle(text=Converting Audio and Spectrogram Functions to PyTorch, isCustom=true)' (3077e93f-75f5-47fc-a8de-f1b2ceaea91a)
+Context:
+--- Code Edits Instructions ---
+When suggesting edits for existing source files,
+prepend the markdown snippet with the modification with the line mentioning the file name.
+Don't add extra empty lines before or after. 
+If the snippet is not a modification of the existing file, don't add this line/tag.
+Example:
+<llm-snippet-file>filename.java</llm-snippet-file>
+```java
+...
+```
+This tag will be later hidden from the user, so it shouldn't affect the rest of the response (for example, don't assume that the user sees it).
+Prefer grouping all edits for a file in a single snippet, but if there are multiple - add the tag before EACH snippet.
+NEVER add the tag inside the snippet (inside the markdown code block), ALWAYS add it before the snippet.
+
+Snippets with edits must show the changed lines with minimal surrounding unchanged lines for context.
+Use comments like `// ... existing code ...` to indicate where original, unmodified code is skipped. Each change must be shown sequentially, separated by `// ... existing code ...`.
+ALWAYS include enough context to make the edit unambiguous. At least, you should add 3 lines BEFORE and AFTER `// ... existing code ...`.
+Do not omit any span of code without explicitly marking it with `// ... existing code ...`.
+NEVER use diff-style markers ("+ line"/"- line").
+
+Example 1:
+original file:
+```java
+class A {
+  public void x() {
+    a();
+    a();
+  }
+  public void y() {
+    b();
+    b();
+  }
+}
+```
+Snippet to insert a new method between x() and y() should look like this:
+```java
+// ... existing code ...
+    a();
+    a();
+  }
+  public void z() {
+    c();
+  }
+  public void y() {
+    b();
+    b();
+// ... existing code ...
+```
+
+Example 2:
+original file:
+```python
+
+def a():
+    print("a")
+
+def b():
+    print("b")
+
+def c():
+    print("c")
+
+def d():
+    print("d")
+
+def e():
+    print("d")
+```
+Snippet to remove method c() from it should look like this:
+```python
+# ... existing code ...
+
+def b():
+    print("b")
+
+def d():
+    print("d")
+
+# ... existing code ...
+```
+--- End of Code Edit Instructions ---
+Messages: 22
+==================================================================================================================================
+
+==== UserMessageImpl #1 ====
+User: 
+convert these to pytorch
+Attachments:
+Attachment Name: Errors in selection
+Attachments Kind: Visible
+Attachments Source: CurrentSelectionRetriever / SelectionProblemsChatAttachment
+Attachments Text:
+
+Unresolved reference 'io'
+at: io
+on the lines:
+  memfile = io.BytesIO()
+
+
+Unresolved reference 'base64'
+at: base64
+on the lines:
+      base64_wavfile=base64.b64encode(memfile.getvalue()).decode('ascii'))
+
+Attachment Name: Project View
+Attachments Kind: Visible
+Attachments Source: AutoUIPickerContextAttachmentSource / AutoloadedUIPickerVisibleChatAttachment
+Attachments Text:
+Project View content:
+```
+midterm
+ .venv
+ Dataset
+ Generated
+ Images
+  Figure1.png
+  Figure2.png
+  Figure3.png
+ Resources
+ .python-version
+ decode.csd
+ encode.csd
+ main.py
+ pyproject.toml
+ README.md
+ synth.py
+ uv.lock
+External Libraries
+Scratches and Consoles
+```
+Attachment Name: Console Selection
+Attachments Kind: Visible
+Attachments Source: Other / SelectionChatAttachment
+Attachments Text:
+def play(array_of_floats, sample_rate=sample_rate):
+  """Play audio in colab using HTML5 audio widget."""
+  if len(array_of_floats.shape) == 2:
+    array_of_floats = array_of_floats[0]
+  normalizer = float(np.iinfo(np.int16).max)
+  array_of_ints = np.array(
+      np.asarray(array_of_floats) * normalizer, dtype=np.int16)
+  memfile = io.BytesIO()
+  wavfile.write(memfile, sample_rate, array_of_ints)
+  html = """<audio controls>
+              <source controls src="data:audio/wav;base64,{base64_wavfile}"
+              type="audio/wav" />
+              Your browser does not support the audio element.
+            </audio>"""
+  html = html.format(
+      base64_wavfile=base64.b64encode(memfile.getvalue()).decode('ascii'))
+  memfile.close()
+  display.display(display.HTML(html))
+
+
+def specplot(audio, vmin=-5, vmax=1, rotate=True, size=512 + 256):
+  """Plot the log magnitude spectrogram of audio."""
+  if len(audio.shape) == 2:
+    audio = audio[0]
+  f, t, Sxx = scipy_signal.stft(audio, fs=sample_rate, nperseg=size,
+                                 noverlap=size * 3 // 4)
+  logmag = np.log10(np.abs(Sxx) + 1e-7)
+  if rotate:
+    logmag = np.flipud(logmag)
+  plt.matshow(logmag, vmin=vmin, vmax=vmax, cmap=plt.cm.magma, aspect='auto')
+  plt.xticks([])
+  plt.yticks([])
+  plt.xlabel('Time')
+  plt.ylabel('Frequency')
+Attachment Name: README.md
+Attachments Kind: Visible
+Attachments Source: RecentFilesRetriever / FileChatAttachment
+Attachments Text:
+```markdown
+# ML Midterm Project Documentation
+Ethan Bessette
+
+## Setup
+
+uv python pin 3.13
+uv init
+uv add torch==2.8 ipykernel jupyter pandas matplotlib scipy
+
+
+## Proposal
+
+### Vision
+Create a model that estimates synthesizer parameters to create patches that match target sounds.
+
+### PseudoCode
+
+![Architecture example](./Images/Figure2.png)
+
+From https://ieeexplore.ieee.org/document/10017350
+
+#### Differentiable synthesizer
+In Csound, I will design an FM synthesizer with 2 audio oscillators, 1 control oscillator, and one noise generator. They will all be able to modulate each other and themselves, like in FM8. Each will have an amplitude envelope.
+
+![FM8](./Images/Figure1.png)
+
+Even with few numbers of oscillators, a large number of sounds can be created. 
+
+https://drive.google.com/file/d/1FBpwcrP1YOWGa7a5kgqJJ4nyOe9Wz6hr/view?usp=sharing
+
+#### In-domain dataset
+All the differentiable parameters will be randomized and coupled with the synth's resulting audio output.
+This process will be automated in the terminal by generating random values to fill a csv for each differentiable synth parameter, reading the values into csound and saving the resulting audio along with the csv of parameters.
+
+#### Out of Domain dataset
+Additionally, audio that doesn't have coupled synth parameters will be used.
+
+#### Structure / Architecture
+This is an area that I have some questions and concerns about. One option is to follow the structure from the paper diagram I included above. On the other hand, I don't know enough about the various structures and optimization / training types.
+Because of this, I might use similar structure to what we've seen in class.
+
+I think if I decide on what structure to use conceptually, I would just need a generic example so I can change it to fit my needs.
+
+Ideas could include:
+Convolutional
+Multi head attention layers within transformer to find changes across time.
+
+##### Data comparisons
+I still have to learn how to use the calculated loss to optimize. I will review the nn_2 and 3 to see what optimization functions are used. For example, the loss of each individual synth parameter might be summed or averaged somehow into overall loss.
+
+For **audio spectral loss**, use MelSpectrogram. The number of bands can be adjusted, the window size, and hop length.
+
+![MelSpectrogram](./Images/Figure3.png)
+
+For **synth parameter loss**, each synth parameter will be normalized from 0 to 1 and the difference taken for each.
+
+
+#### Training
+The datasets will be divided 80-10-10 training validation testing.
+For in domain data, the loss between estimated synth parameters and real will be calculated and used to optimize.
+For all data, the audio spectral loss will be calculated by taking the difference of the MelSpectrogram of original and predicted audio and used to optimize.
+
+
+
+
+## Notepad
+Window of 4 chords, what is most likely next chord?
+Training:
+- 4 chords of song, give next chord
+
+So for audio, give a window of seconds and therefor x samples. Predict next y samples, add to output, move window
+
+Diffusion model
+Encoding: add noise to data over course of time steps until full noise.
+Train it to recognize where it is in timestep, therefore how much noise to remove to get back one tilmestep, repeat until back to original image
+It trains it to predict noise to remove per timestep until it gets an image that resembles the training images
+
+
+DDSP
+Train a model to control digital signal processing parameters to create a complex synthesizers given note pitch, velocity, and length
+- label training data with note pitch, velocity, and length
+- window of x notes of input (range of input length from 1 to maybe 4)
+
+Get output sound, match to original synthesizer, adjust sytnhezsizer parameters to reduce difference
+- gradient descent
+
+
+Calculating the loss change in output and input to gradient descent 
+- could be used for deep ANC
+
+https://realpython.com/gradient-descent-algorithm-python/
+This explains gradient descent. For a 2d vector (x,y) it finds a 1d vector, the minimum, by getting the gradient (the derivative of the 2d vector) and 
+
+
+The next chord predictor is probabilistic. It gets optimized 
+
+
+
+I could get samples of an instrument or my voice. Then
+DDSP
+Create structure of synthesizers and parameters. Randomize parameters, calculate loss, move parameters to minimize loss.
+I could calculate gradient descent of move input towards trained function
+For each audio sample, calculate difference of output to original
+
+
+One hot encoding aligns output with true correct answer in one hot encoding to determine loss.
+So for my model, it should have one output for each changeable synth parameter.
+
+
+## The Process
+
+### Dataset creation
+I created a csound file that outputs 32 floating point wave files at each of 12 notes through the same synthesizer, naming them the index of the synth along with the note number. Outputting results in a dataset being generated that contains sets of 12 notes for each set of random synth parameters along with text files holding the synth parameters. As of now, I haven't found a way to output only the synth parameters, so the text file contains a header that will need to be discarded when cleaning data for machine learning training.
+
+There is an encode.csd file that generates parameters and creates audio for them, as well as a decode.csd that reads parameters and generates data. I tested them and it works. I also tested them on my own new parameters that I changed by hand.
+
+The next step will be figuring out how to get the .csd to run in the correct order in training. Also, training will take a long time unless I figure out how to make generating audio much faster for the amount of data I have.
+
+While the data is generating, I'm checking my activity monitor and it looks like processing is kept to 1 processor. I wonder if I could figure out multi threading to make it faster as well as forcing csound to make new instances instead of reusing them.
+
+#### Problems
+1. One problem was figuring out how to keep the pitch relatively constant during self modulation. When an oscillator self modulates its frequency, the pitch is perceived as lowering as the sidebands to the positive and negative are created. I researched ways to keep this constant and first kind Bessel functions were what came up. I tried to ask ChatGPT to help write functions to keep the pitch normal by calculating the spectral center as a function of f0 and self modulation index, but when I tried to implement it in Csound, it was too computationally expensive and sound froze every time. I spent a while finding a workaround and I ended up using a realtime polynomial function to approximate the amount of frequency offset within the range of parameters that I was using. It stops working at a certain point, but that doesn't matter since the way I programmed the synth it will never generate parameters outside that range. I also realized that a small amount of modulation by the original frequency helped to stabilize the pitch. I slightly modulate the frequency of the oscillator with a separate oscillator at its original frequency as a function of self-modulation index. While it adds some harmonics not present in true self-modulation, it doesn't matter.
+
+2. Another problem was figuring out how to keep the parameters constant while generating 12 different pitches of the same parameters. I ended up using two different scheduler instruments to do this. One scheduler spawns instances of the other scheduler so that synth sets can be generated in parallel. The other scheduler spawns 12 parallel instances of one set of parameters at different pitches. The instances themselves output the audio data, while the second scheduler holds the generated parameters and outputs them when done.
+
+3. Originally, the synth parameters were generated in each instance of a note. This obviously didn't work because what was supposed to be different pitches with the same parameters actually all had different parameters. To fix this, I generated each parameter from 0 to 1 in the 2nd scheduler instrument and set up the note instrument so that the scheduler could pass in the parameters when called. The note instrument can further process these normalized values. This allows the eventual machine learning algorithm to be able to output normalized values for the parameters which can be used to generate audio.
+
+4. It turns out Csound re-uses instances of instruments to save storage in memory. This was causing a problem where two clips were combined in one in the output audio. To solve this, I made sure to offset the parent scheduler so that it never created secondary schedulers at the same time. Note to self, I bet if I use more primary schedulers than the note length, I might have to change this so that it instantiates notes with a new identity instead of simply offsetting.
+    - Update, yes, this is the case. If I were to keep the note 5 seconds, that means I can only uses 5 instruments at a time. To generate 1000 sets of synth parameters, it would take 200 seconds to generate the dataset. Honestly that's reasonable, I'll keep it how it is for now. Nevermind 200 seconds only generates 200 examples. Def something I need to fix.
+
+
+#### DDSP
+Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters e2e differentiable.
+
+##### Original DDSP Library
+1. Preprocess raw audio
+    - detect fundamental frequency and loudness over time for 5 second clips of audio, store in a TFRecord file
+2. Save dataset stats so that future inputs can be processed to match training data
+    - pitch (f0), power, loudness, quantile transform.
+3. 
+
+
+
+##### My Implementation
+
+
+1. Break training audio into Mel spectrogram at time points
+
+
+2. Given spectrogram,
+3. estimate synth parameters
+4. process audio tensor from those parameters, convert to Mel spectrogram
+5. Find loss between output and training Mel spectrogram
+6. Find loss between estimated and real synth parameters
+
+Flow of DDSP library:
+- preprocess raw audio into dataset
+    - detects 
+
+
+1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
+2. Uses those in additive to create pitched part of input
+3. Uses noise and filter to create unpatched
+4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio, 
+
+
+```
+
+
+kotlin.Unit
+
+==== SimpleCompletableMessage #2 ====
+Assistant: 
+Here are PyTorch versions of those functions.
+
+You’ll still need standard-library imports for the audio player helper:
+
+```python
+import io
+import base64
+
+import torch
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.signal as scipy_signal
+from scipy.io import wavfile
+from IPython import display
+```
+
+### PyTorch `play`
+
+This version accepts either a `torch.Tensor` or something NumPy-convertible.
+
+```python
+def play_torch(audio, sample_rate):
+    """Play audio in a notebook using HTML5 audio widget."""
+    if isinstance(audio, torch.Tensor):
+        audio = audio.detach().cpu()
+
+        if audio.ndim == 2:
+            audio = audio[0]
+
+        audio = audio.clamp(-1.0, 1.0)
+        audio_np = audio.numpy()
+    else:
+        audio_np = np.asarray(audio)
+        if audio_np.ndim == 2:
+            audio_np = audio_np[0]
+
+    normalizer = float(np.iinfo(np.int16).max)
+    audio_int16 = (audio_np * normalizer).astype(np.int16)
+
+    memfile = io.BytesIO()
+    wavfile.write(memfile, sample_rate, audio_int16)
+
+    html = """<audio controls>
+                <source src="data:audio/wav;base64,{base64_wavfile}" type="audio/wav" />
+                Your browser does not support the audio element.
+              </audio>"""
+
+    html = html.format(
+        base64_wavfile=base64.b64encode(memfile.getvalue()).decode("ascii")
+    )
+    memfile.close()
+    display.display(display.HTML(html))
+```
+
+---
+
+### PyTorch `specplot`
+
+PyTorch has `torch.stft`, so this version avoids `scipy.signal.stft`.
+
+```python
+def specplot_torch(audio, sample_rate, vmin=-5, vmax=1, rotate=True, size=512 + 256):
+    """Plot the log magnitude spectrogram of audio using torch.stft."""
+    if not isinstance(audio, torch.Tensor):
+        audio = torch.tensor(audio, dtype=torch.float32)
+    else:
+        audio = audio.detach().cpu().float()
+
+    if audio.ndim == 2:
+        audio = audio[0]
+
+    hop_length = size // 4
+    window = torch.hann_window(size)
+
+    stft = torch.stft(
+        audio,
+        n_fft=size,
+        hop_length=hop_length,
+        win_length=size,
+        window=window,
+        center=True,
+        return_complex=True,
+    )
+
+    logmag = torch.log10(torch.abs(stft) + 1e-7)
+
+    if rotate:
+        logmag = torch.flip(logmag, dims=[0])
+
+    plt.matshow(logmag.numpy(), vmin=vmin, vmax=vmax, cmap=plt.cm.magma, aspect="auto")
+    plt.xticks([])
+    plt.yticks([])
+    plt.xlabel("Time")
+    plt.ylabel("Frequency")
+```
+
+---
+
+### Notes
+
+- `play_torch()` uses PyTorch only for tensor handling, but `wavfile.write`, `io`, and `base64` are still the right tools for outputting playable audio in a notebook.
+- `specplot_torch()` is the more direct PyTorch conversion because `torch.stft()` replaces `scipy.signal.stft()`.
+- If your tensors are on GPU, these functions move them to CPU with `.detach().cpu()` before plotting or writing audio.
+
+If you want, I can also convert this into a single utility block for your `main.py` or `synth.py`.
+
+kotlin.Unit
+
+==== UserMessageImpl #3 ====
+User: 
+the above doesnt work because my ide cant render html objects. is there another way to easily hear audio in the ide?
+Attachments:
+Attachment Name: README.md
+Attachments Kind: Visible
+Attachments Source: RecentFilesRetriever / FileChatAttachment
+Attachments Text:
+```markdown
+# ML Midterm Project Documentation
+Ethan Bessette
+
+## Setup
+
+uv python pin 3.13
+uv init
+uv add torch==2.8 ipykernel jupyter pandas matplotlib scipy
+
+
+## Proposal
+
+### Vision
+Create a model that estimates synthesizer parameters to create patches that match target sounds.
+
+### PseudoCode
+
+![Architecture example](./Images/Figure2.png)
+
+From https://ieeexplore.ieee.org/document/10017350
+
+#### Differentiable synthesizer
+In Csound, I will design an FM synthesizer with 2 audio oscillators, 1 control oscillator, and one noise generator. They will all be able to modulate each other and themselves, like in FM8. Each will have an amplitude envelope.
+
+![FM8](./Images/Figure1.png)
+
+Even with few numbers of oscillators, a large number of sounds can be created. 
+
+https://drive.google.com/file/d/1FBpwcrP1YOWGa7a5kgqJJ4nyOe9Wz6hr/view?usp=sharing
+
+#### In-domain dataset
+All the differentiable parameters will be randomized and coupled with the synth's resulting audio output.
+This process will be automated in the terminal by generating random values to fill a csv for each differentiable synth parameter, reading the values into csound and saving the resulting audio along with the csv of parameters.
+
+#### Out of Domain dataset
+Additionally, audio that doesn't have coupled synth parameters will be used.
+
+#### Structure / Architecture
+This is an area that I have some questions and concerns about. One option is to follow the structure from the paper diagram I included above. On the other hand, I don't know enough about the various structures and optimization / training types.
+Because of this, I might use similar structure to what we've seen in class.
+
+I think if I decide on what structure to use conceptually, I would just need a generic example so I can change it to fit my needs.
+
+Ideas could include:
+Convolutional
+Multi head attention layers within transformer to find changes across time.
+
+##### Data comparisons
+I still have to learn how to use the calculated loss to optimize. I will review the nn_2 and 3 to see what optimization functions are used. For example, the loss of each individual synth parameter might be summed or averaged somehow into overall loss.
+
+For **audio spectral loss**, use MelSpectrogram. The number of bands can be adjusted, the window size, and hop length.
+
+![MelSpectrogram](./Images/Figure3.png)
+
+For **synth parameter loss**, each synth parameter will be normalized from 0 to 1 and the difference taken for each.
+
+
+#### Training
+The datasets will be divided 80-10-10 training validation testing.
+For in domain data, the loss between estimated synth parameters and real will be calculated and used to optimize.
+For all data, the audio spectral loss will be calculated by taking the difference of the MelSpectrogram of original and predicted audio and used to optimize.
+
+
+
+
+## Notepad
+Window of 4 chords, what is most likely next chord?
+Training:
+- 4 chords of song, give next chord
+
+So for audio, give a window of seconds and therefor x samples. Predict next y samples, add to output, move window
+
+Diffusion model
+Encoding: add noise to data over course of time steps until full noise.
+Train it to recognize where it is in timestep, therefore how much noise to remove to get back one tilmestep, repeat until back to original image
+It trains it to predict noise to remove per timestep until it gets an image that resembles the training images
+
+
+DDSP
+Train a model to control digital signal processing parameters to create a complex synthesizers given note pitch, velocity, and length
+- label training data with note pitch, velocity, and length
+- window of x notes of input (range of input length from 1 to maybe 4)
+
+Get output sound, match to original synthesizer, adjust sytnhezsizer parameters to reduce difference
+- gradient descent
+
+
+Calculating the loss change in output and input to gradient descent 
+- could be used for deep ANC
+
+https://realpython.com/gradient-descent-algorithm-python/
+This explains gradient descent. For a 2d vector (x,y) it finds a 1d vector, the minimum, by getting the gradient (the derivative of the 2d vector) and 
+
+
+The next chord predictor is probabilistic. It gets optimized 
+
+
+
+I could get samples of an instrument or my voice. Then
+DDSP
+Create structure of synthesizers and parameters. Randomize parameters, calculate loss, move parameters to minimize loss.
+I could calculate gradient descent of move input towards trained function
+For each audio sample, calculate difference of output to original
+
+
+One hot encoding aligns output with true correct answer in one hot encoding to determine loss.
+So for my model, it should have one output for each changeable synth parameter.
+
+
+## The Process
+
+### Dataset creation
+I created a csound file that outputs 32 floating point wave files at each of 12 notes through the same synthesizer, naming them the index of the synth along with the note number. Outputting results in a dataset being generated that contains sets of 12 notes for each set of random synth parameters along with text files holding the synth parameters. As of now, I haven't found a way to output only the synth parameters, so the text file contains a header that will need to be discarded when cleaning data for machine learning training.
+
+There is an encode.csd file that generates parameters and creates audio for them, as well as a decode.csd that reads parameters and generates data. I tested them and it works. I also tested them on my own new parameters that I changed by hand.
+
+The next step will be figuring out how to get the .csd to run in the correct order in training. Also, training will take a long time unless I figure out how to make generating audio much faster for the amount of data I have.
+
+While the data is generating, I'm checking my activity monitor and it looks like processing is kept to 1 processor. I wonder if I could figure out multi threading to make it faster as well as forcing csound to make new instances instead of reusing them.
+
+#### Problems
+1. One problem was figuring out how to keep the pitch relatively constant during self modulation. When an oscillator self modulates its frequency, the pitch is perceived as lowering as the sidebands to the positive and negative are created. I researched ways to keep this constant and first kind Bessel functions were what came up. I tried to ask ChatGPT to help write functions to keep the pitch normal by calculating the spectral center as a function of f0 and self modulation index, but when I tried to implement it in Csound, it was too computationally expensive and sound froze every time. I spent a while finding a workaround and I ended up using a realtime polynomial function to approximate the amount of frequency offset within the range of parameters that I was using. It stops working at a certain point, but that doesn't matter since the way I programmed the synth it will never generate parameters outside that range. I also realized that a small amount of modulation by the original frequency helped to stabilize the pitch. I slightly modulate the frequency of the oscillator with a separate oscillator at its original frequency as a function of self-modulation index. While it adds some harmonics not present in true self-modulation, it doesn't matter.
+
+2. Another problem was figuring out how to keep the parameters constant while generating 12 different pitches of the same parameters. I ended up using two different scheduler instruments to do this. One scheduler spawns instances of the other scheduler so that synth sets can be generated in parallel. The other scheduler spawns 12 parallel instances of one set of parameters at different pitches. The instances themselves output the audio data, while the second scheduler holds the generated parameters and outputs them when done.
+
+3. Originally, the synth parameters were generated in each instance of a note. This obviously didn't work because what was supposed to be different pitches with the same parameters actually all had different parameters. To fix this, I generated each parameter from 0 to 1 in the 2nd scheduler instrument and set up the note instrument so that the scheduler could pass in the parameters when called. The note instrument can further process these normalized values. This allows the eventual machine learning algorithm to be able to output normalized values for the parameters which can be used to generate audio.
+
+4. It turns out Csound re-uses instances of instruments to save storage in memory. This was causing a problem where two clips were combined in one in the output audio. To solve this, I made sure to offset the parent scheduler so that it never created secondary schedulers at the same time. Note to self, I bet if I use more primary schedulers than the note length, I might have to change this so that it instantiates notes with a new identity instead of simply offsetting.
+    - Update, yes, this is the case. If I were to keep the note 5 seconds, that means I can only uses 5 instruments at a time. To generate 1000 sets of synth parameters, it would take 200 seconds to generate the dataset. Honestly that's reasonable, I'll keep it how it is for now. Nevermind 200 seconds only generates 200 examples. Def something I need to fix.
+
+
+#### DDSP
+Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters e2e differentiable.
+
+##### Original DDSP Library
+1. Preprocess raw audio
+    - detect fundamental frequency and loudness over time for 5 second clips of audio, store in a TFRecord file
+2. Save dataset stats so that future inputs can be processed to match training data
+    - pitch (f0), power, loudness, quantile transform.
+3. 
+
+
+
+##### My Implementation
+
+
+1. Break training audio into Mel spectrogram at time points
+
+
+2. Given spectrogram,
+3. estimate synth parameters
+4. process audio tensor from those parameters, convert to Mel spectrogram
+5. Find loss between output and training Mel spectrogram
+6. Find loss between estimated and real synth parameters
+
+Flow of DDSP library:
+- preprocess raw audio into dataset
+    - detects 
+
+
+1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
+2. Uses those in additive to create pitched part of input
+3. Uses noise and filter to create unpatched
+4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio, 
+
+
+```
+
+
+kotlin.Unit
+
+==== SimpleCompletableMessage #4 ====
+Assistant: 
+Yes — if your IDE view can’t render HTML/audio widgets, the easiest options are:
+
+1. **play audio directly through your speakers**
+2. **save a `.wav` file and open it**
+3. **if you’re in a real Jupyter notebook in PyCharm/DataSpell, try notebook media output instead of raw HTML** — JetBrains docs note notebook outputs can include media [[1]](https://www.jetbrains.com/help/pycharm/2025.3/jupyter-notebook-support.html)
+
+## Easiest direct playback: `sounddevice`
+
+Install:
+
+```bash
+uv add sounddevice
+```
+
+Then use:
+
+```python
+import time
+import torch
+import numpy as np
+import sounddevice as sd
+
+
+def play_audio(audio, sample_rate):
+    if isinstance(audio, torch.Tensor):
+        audio = audio.detach().cpu().float().numpy()
+    else:
+        audio = np.asarray(audio, dtype=np.float32)
+
+    if audio.ndim == 2:
+        audio = audio[0]
+
+    audio = np.clip(audio, -1.0, 1.0)
+    sd.play(audio, sample_rate)
+    sd.wait()
+```
+
+Example:
+
+```python
+play_audio(my_tensor, 44100)
+```
+
+## If `sounddevice` gives device errors
+
+Use a file-based fallback:
+
+```python
+import torch
+import numpy as np
+from scipy.io import wavfile
+
+
+def save_audio(audio, sample_rate, path="preview.wav"):
+    if isinstance(audio, torch.Tensor):
+        audio = audio.detach().cpu().float().numpy()
+    else:
+        audio = np.asarray(audio, dtype=np.float32)
+
+    if audio.ndim == 2:
+        audio = audio[0]
+
+    audio = np.clip(audio, -1.0, 1.0)
+    audio_int16 = (audio * 32767).astype(np.int16)
+    wavfile.write(path, sample_rate, audio_int16)
+    print(f"Saved to {path}")
+```
+
+Then:
+
+```python
+save_audio(my_tensor, 44100, "test.wav")
+```
+
+and open `test.wav` from the project pane.
+
+## Another direct-play option: `simpleaudio`
+
+Sometimes this is easier than `sounddevice`.
+
+Install:
+
+```bash
+uv add simpleaudio
+```
+
+Code:
+
+```python
+import torch
+import numpy as np
+import simpleaudio as sa
+
+
+def play_audio_simple(audio, sample_rate):
+    if isinstance(audio, torch.Tensor):
+        audio = audio.detach().cpu().float().numpy()
+    else:
+        audio = np.asarray(audio, dtype=np.float32)
+
+    if audio.ndim == 2:
+        audio = audio[0]
+
+    audio = np.clip(audio, -1.0, 1.0)
+    audio_int16 = (audio * 32767).astype(np.int16)
+
+    play_obj = sa.play_buffer(audio_int16, 1, 2, sample_rate)
+    play_obj.wait_done()
+```
+
+## Recommendation
+
+For your setup, I’d use this order:
+
+- **first try `sounddevice`**
+- if that’s annoying on your machine, **save `.wav` files**
+- if you are specifically in a notebook editor, try `IPython.display.Audio(...)` rather than custom HTML, since notebook media output is supported [[1]](https://www.jetbrains.com/help/pycharm/2025.3/jupyter-notebook-support.html)
+
+If you want, I can give you one **single `play()` helper** that:
+- accepts PyTorch tensors,
+- tries speaker playback first,
+- and falls back to saving a wav automatically.
+Before answering it did these function calls:
+              functionName: com.intellij.ml.llm.qa.endpoint.DocumentationQAEndpoint@77259c6d
+              parameters: {"query":"JetBrains IDE notebook audio playback render HTML objects IPython display Audio support", "dataSource":"IntelliJ Docs"}
+              content: Found documents:
+ 
+Document link: https://www.jetbrains.com/help/pycharm/2025.3/jupyter-notebook-support.html
+Snippet:
+With Jupyter Notebook integration available in PyCharm,  you can edit, execute, and debug notebook source code and examine execution outputs including stream data, images, and other media.
+Notebook support in PyCharm includes:
+- Coding assistance:
+Error and syntax highlighting.
+Code completion.
+Ability to create line comments ⌘/.
+- Ability to execute IPython commands in the Python console.
+- Dedicated Jupyter Notebook Debugger.
+- Shortcuts for basic operations with Jupyter notebooks.
+- Ability to recognize .ipynb files and mark them with the ![](https://resources.jetbrains.com/help/img/idea/2025.3/python-jupyter.icons.org.jetbrains.plugins.notebooks.jupyter.expui.jupyterNotebook.svg) icon.
+- Jupyter project template.
+- Jupyter-specific AI features.
+Actions:
+<Action id: CommentByLineComment; Title: Comment with Line Comment; Shortcut: ⌘/ Description: Comment/uncomment the current line or selected block with line comments>
+
+
+Document link: https://www.jetbrains.com/help/pycharm/2025.3/interactive-js-widgets.html
+Snippet:
+PyCharm supports interactive widgets that provide integration between Python code running in the notebook kernel and JavaScript running in the browser.
+For more details about the variety and specifics of interactive widgets, refer to Jupyter widgets documentation.
+
+
+Document link: https://www.jetbrains.com/help/pycharm/2025.3/tensorboard-support.html
+Snippet:
+PyCharm provides support for integrating TensorBoard directly within Jupyter notebooks, enabling tracking and visualization of your machine learning experiments.
+
+
+Document link: https://www.jetbrains.com/help/pycharm/2025.3/running-jupyter-notebook-cells.html#console
+Snippet:
+This functionality is enabled by default for both local and remote kernels. To disable it for remote kernels, go to Settings | Jupyter | Jupyter General and uncheck the Upload support libs to remote Jupyter checkbox.
+When you execute your notebook, you can preview variables in the Variables tab of the Jupyter console.
+By default, variables are loaded asynchronously. To change the loading policy, click ![](https://resources.jetbrains.com/help/img/idea/2025.3/app.expui.general.settings.svg) in the Variables tab, select Variables Loading Policy, and select one of the available modes. See Managing Variables Loading Policy for more details.
+You can click View as Array, View as DataFrame, View as Image, or View as Series to display the data in the corresponding tool window. For more information, refer to Work with outputs.
+
+
+Document link: https://www.jetbrains.com/help/pycharm/2025.3/quick-start-guide.html#data-science
+Snippet:
+PyCharm has an interactive Python console to perform smart operations over data with on-the-fly syntax check with inspections, braces and quotes matching, and of course, code completion. You can also benefit from the built-in support for Anaconda.
+With PyCharm Pro, you can analyze and visualize various scientific and statistical data. Jupyter Notebook integration enables editing, executing, and debugging notebook source code and examining execution outputs, including stream data, images, and other media.
+With the R plugin installed in PyCharm, you can perform various statistical computing using R language and use coding assistance, visual debugging, smart running and preview tools, and other popular IDE features.
+As you might have noticed already, creating projects of the various types (Django, for example) requires a data source. It is also quite possible that you inject SQL statements into your source code.
+PyCharm Pro does not enable you to create databases, but provides facilities to manage and query them. Once you are granted access to a certain database, you can configure one or more data sources within PyCharm that reflect the structure of the database and store the database access credentials. Based on this information, PyCharm establishes a connection to the database and provides the ability to retrieve or change information contained therein.
+Access to the databases is provided by the Database window (View | Tool Windows | Database). This tool window allows you to work with the databases. It lets you view and modify data structures in your databases, and perform other associated tasks.
+For more information, refer to Database Tools and SQL.
+
+
+Document link: https://www.jetbrains.com/help/pycharm/2025.3/scientific-tools.html
+Snippet:
+PyCharm supports the following tools for data science and machine learning:
+- Formats for data view
+The Data View tool window supports NumPy arrays and pandas dataframes.
+- Data visualization formats
+Matplotlib and Plotly provide a set of Python plotting libraries.
+- Jupyter notebooks
+IPython provides a rich architecture for interactive computing with data visualization.
+With the Jupyter Notebook integration available in PyCharm,  you can edit, execute, and debug notebook source code and examine execution outputs including stream data, images, and other media.
+
+
+Document link: https://www.jetbrains.com/help/ai-assistant/about-ai-assistant.html#ai-in-jupyter-notebooks
+Snippet:
+Generate visualizations
+Available in: PyCharm, DataSpell
+Not available in: CLion, DataGrip, GoLand, IntelliJ IDEA, PhpStorm, Rider, RubyMine, RustRover, WebStorm
+
+
+Document link: https://www.jetbrains.com/help/ai-assistant/ai-in-jupyter-notebooks.html
+Snippet:
+Only available in: PyCharm Professional and DataSpell
+Use Jupyter-specific AI features in PyCharm and DataSpell to explain Jupyter cells and dataframes, create new cells, generate visualizations, edit cells, and fix errors in your code.
+
+
+Document link: https://www.jetbrains.com/help/pycharm/2025.3/working-with-cell-outputs.html#plots
+Snippet:
+Click this button to toggle a chessboard background.
+
+
+Document link: https://www.jetbrains.com/help/pycharm/2025.3/running-jupyter-notebook-cells.html#debug-code-in-jupyter-notebooks
+Snippet:
+PyCharm provides the Jupyter Notebook Debugger for both local and remote Jupyter server kernels.
+The following debugging features are not supported for remote Jupyter servers at the moment:
+Stepping into library code
+Debug Console
+Smart step into
+Run to cursor
+Step out
+Debugging code with multiprocessing and threading
+Progressive loading of large arrays
+Debugging is not supported for Google Colab servers .
+
+ 
+The search result is limited to 10 documents. You MUST decide which answers are useful for user by yourself.
+As search engine and documentation may be not perfect, this result is intended to be complementary to final answer rather than final answer itself.
+
+When employing information from a document, you MUST reference it using this syntax: [[number]](document_link).
+For instance: [[1]](https://www.jetbrains.com/help/idea/getting-started.html)
+Numbers should be incremented in order of referencing them starting from 1. Non-referenced documents shouldn't affect number incrementation, because user doesn't see search result itself.
+There are many nuances with the display of shortcuts. In order not to confuse them with punctuation marks, and also to clearly separate each key, you MUST use separate inline code span syntax for each key. Separate this keys by space.
+If shortcut contain backtick (`) key, use double-backtick span for it: `` ` ``.
+Example for ⌃⇧` shortcut usage: `⌃` `⇧` `` ` ``
+
+If you want to mention an action for user, in your next steps you MUST embed action button in message with following syntax: 
+<ActionButton id="ACTION_ID"/> (with ACTION_ID changed to actual id).
+----------------------------------------------------------------------------------------------------------------------------------
+
+
+kotlin.Unit
+
+==== UserMessageImpl #5 ====
+User: 
+convert specplot_torch into using matplitlib.pyplot
+
+kotlin.Unit
+
+==== SimpleCompletableMessage #6 ====
+Assistant: 
+Sure — here’s `specplot_torch` written explicitly with `matplotlib.pyplot` using `plt.figure()` and `plt.imshow()` instead of `plt.matshow()`:
+
+```python
+import torch
+import matplotlib.pyplot as plt
+
+
+def specplot_torch(audio, sample_rate, vmin=-5, vmax=1, rotate=True, size=768):
+    """Plot the log-magnitude spectrogram of audio using torch.stft and matplotlib.pyplot."""
+    if not isinstance(audio, torch.Tensor):
+        audio = torch.tensor(audio, dtype=torch.float32)
+    else:
+        audio = audio.detach().cpu().float()
+
+    if audio.ndim == 2:
+        audio = audio[0]
+
+    hop_length = size // 4
+    window = torch.hann_window(size)
+
+    stft = torch.stft(
+        audio,
+        n_fft=size,
+        hop_length=hop_length,
+        win_length=size,
+        window=window,
+        center=True,
+        return_complex=True,
+    )
+
+    logmag = torch.log10(torch.abs(stft) + 1e-7)
+
+    if rotate:
+        logmag = torch.flip(logmag, dims=[0])
+
+    logmag = logmag.numpy()
+
+    plt.figure(figsize=(10, 4))
+    plt.imshow(
+        logmag,
+        vmin=vmin,
+        vmax=vmax,
+        cmap="magma",
+        aspect="auto",
+        origin="upper" if rotate else "lower",
+    )
+    plt.xlabel("Time")
+    plt.ylabel("Frequency")
+    plt.xticks([])
+    plt.yticks([])
+    plt.tight_layout()
+    plt.show()
+```
+
+### What changed
+- Replaced `plt.matshow(...)` with `plt.figure(...)` + `plt.imshow(...)`
+- Added `plt.show()` so it renders reliably
+- Kept the same spectrogram logic with `torch.stft`
+
+If you want, I can also make it:
+- add a **colorbar**
+- match SciPy STFT more closely
+- or return the spectrogram tensor instead of only plotting it.
+
+kotlin.Unit
+
+==== UserMessageImpl #7 ====
+User: 
+i want to store a new rnd(1) at each index of a list. I dont need to store the parameter names after encoding, but I need to be able to decode and assign parameter names back to the values after processing. whats the best way?
+Attachments:
+Attachment Name: Project View
+Attachments Kind: Visible
+Attachments Source: AutoUIPickerContextAttachmentSource / AutoloadedUIPickerVisibleChatAttachment
+Attachments Text:
+Project View content:
+```
+midterm
+ .venv
+ Dataset
+ Generated
+ Images
+  Figure1.png
+  Figure2.png
+  Figure3.png
+ Resources
+ .python-version
+ decode.csd
+ encode.csd
+ main.py
+ pyproject.toml
+ README.md
+ synth.py
+ uv.lock
+External Libraries
+Scratches and Consoles
+```
+Attachment Name: Console Selection
+Attachments Kind: Visible
+Attachments Source: Other / SelectionChatAttachment
+Attachments Text:
+PARAMS = ["i1ratio","i1index1","i1index2","i2index2","i2index1","i1out","i2out","iattack1","idecay1","isustaintime1","isustain1","irelease1","iattack2","idecay2","isustaintime2","isustain2","irelease2"]
+stoi = {param: float(i) for i, param in enumerate(PARAMS)}
+
+if generate:
+    i1ratio = rnd(1)
+    i1index1 = rnd(1)
+    i1index2 = rnd(1)
+    i2index2 = rnd(1)
+    i2index1  = rnd(1)
+    i1out = rnd(1)
+    i2out = rnd(1)
+    iattack1 = rnd(1)
+    idecay1 = rnd(1)
+    isustaintime1 = rnd(1)
+    isustain1 = rnd(1)
+    irelease1 = rnd(1)
+    iattack2 = rnd(1)
+    idecay2 = rnd(1)
+    isustaintime2 = rnd(1)
+    isustain2 = rnd(1)
+    irelease2 = rnd(1)
+Attachment Name: Console Selection
+Attachments Kind: Visible
+Attachments Source: Other / SelectionChatAttachment
+Attachments Text:
+def specplot_torch(audio, sample_rate, vmin=-5, vmax=1, rotate=True, size=768):
+    """Plot the log-magnitude spectrogram of audio using torch.stft and matplotlib.pyplot."""
+    if not isinstance(audio, torch.Tensor):
+        audio = torch.tensor(audio, dtype=torch.float32)
+    else:
+        audio = audio.detach().cpu().float()
+
+    if audio.ndim == 2:
+        audio = audio[0]
+
+    hop_length = size // 4
+    window = torch.hann_window(size)
+
+    stft = torch.stft(
+        audio,
+        n_fft=size,
+        hop_length=hop_length,
+        win_length=size,
+        window=window,
+        center=True,
+        return_complex=True,
+    )
+
+    logmag = torch.log10(torch.abs(stft) + 1e-7)
+
+    if rotate:
+        logmag = torch.flip(logmag, dims=[0])
+
+    logmag = logmag.numpy()
+
+    plt.figure(figsize=(10, 4))
+    plt.imshow(
+        logmag,
+        vmin=vmin,
+        vmax=vmax,
+        cmap="magma",
+        aspect="auto",
+        origin="upper" if rotate else "lower",
+    )
+    plt.xlabel("Time")
+    plt.ylabel("Frequency")
+    plt.xticks([])
+    plt.yticks([])
+    plt.tight_layout()
+    plt.show()
+
+
+kotlin.Unit
+
+==== SimpleCompletableMessage #8 ====
+Assistant: 
+The best way is:
+
+- keep **one fixed ordered list** of parameter names
+- store only the **values** in a list / tensor
+- when decoding, recover names by **zipping** the values back with that same ordered list
+
+You do **not** need to store names with every example, as long as the order never changes.
+
+## Best structure
+
+```python
+PARAMS = [
+    "i1ratio", "i1index1", "i1index2", "i2index2", "i2index1",
+    "i1out", "i2out",
+    "iattack1", "idecay1", "isustaintime1", "isustain1", "irelease1",
+    "iattack2", "idecay2", "isustaintime2", "isustain2", "irelease2",
+]
+
+stoi = {name: i for i, name in enumerate(PARAMS)}
+itos = {i: name for i, name in enumerate(PARAMS)}
+```
+
+Note: `stoi` should usually map to **int**, not `float`.
+
+---
+
+## Encode: generate values in fixed order
+
+If you want one random value per parameter:
+
+```python
+values = [rnd(1) for _ in PARAMS]
+```
+
+Now:
+
+- `values[0]` always means `"i1ratio"`
+- `values[1]` always means `"i1index1"`
+- etc.
+
+That’s the simplest and best approach.
+
+---
+
+## Decode: assign names back to values
+
+Later, after processing:
+
+```python
+decoded = dict(zip(PARAMS, values))
+```
+
+Now `decoded` becomes:
+
+```python
+{
+    "i1ratio": ...,
+    "i1index1": ...,
+    ...
+}
+```
+
+That is usually the cleanest way to restore parameter names.
+
+---
+
+## If you want to access by name and by index
+
+You can do both:
+
+```python
+i = stoi["i1ratio"]
+value = values[i]
+```
+
+and reverse:
+
+```python
+name = itos[0]
+```
+
+---
+
+## Good pattern for ML
+
+For machine learning, this is especially nice because your model outputs a vector:
+
+```python
+pred = model(x)   # shape [17]
+```
+
+and then you decode with:
+
+```python
+pred_params = dict(zip(PARAMS, pred.tolist()))
+```
+
+So the model only deals with numeric vectors, and you only reattach names when needed.
+
+---
+
+## Recommended helper functions
+
+```python
+PARAMS = [
+    "i1ratio", "i1index1", "i1index2", "i2index2", "i2index1",
+    "i1out", "i2out",
+    "iattack1", "idecay1", "isustaintime1", "isustain1", "irelease1",
+    "iattack2", "idecay2", "isustaintime2", "isustain2", "irelease2",
+]
+
+stoi = {name: i for i, name in enumerate(PARAMS)}
+itos = {i: name for i, name in enumerate(PARAMS)}
+
+
+def encode_random():
+    return [rnd(1) for _ in PARAMS]
+
+
+def decode_values(values):
+    return dict(zip(PARAMS, values))
+```
+
+Usage:
+
+```python
+encoded = encode_random()
+decoded = decode_values(encoded)
+```
+
+---
+
+## If using PyTorch tensors
+
+If you want training data as tensors:
+
+```python
+import torch
+
+values = torch.tensor([rnd(1) for _ in PARAMS], dtype=torch.float32)
+decoded = dict(zip(PARAMS, values.tolist()))
+```
+
+That is probably the best setup for your project.
+
+---
+
+## Important rule
+
+This only works well if:
+
+- `PARAMS` is your **single source of truth**
+- you never reorder it accidentally
+
+If you change the order later, old encoded vectors will decode incorrectly.
+
+---
+
+## Short answer
+
+Use:
+
+```python
+PARAMS = [...]
+values = [rnd(1) for _ in PARAMS]
+decoded = dict(zip(PARAMS, values))
+```
+
+That’s the cleanest solution.
+
+If you want, I can also show you a version that converts between:
+
+- named parameter `dict`
+- flat list
+- PyTorch tensor
+
+so you can move easily between synthesis code and ML code.
+
+kotlin.Unit
+
+==== UserMessageImpl #9 ====
+User: 
+csound
+Sparamfile sprintf "Generated/%04d.txt",gifilenumber
+
+Attachments:
+Attachment Name: Project View
+Attachments Kind: Visible
+Attachments Source: AutoUIPickerContextAttachmentSource / AutoloadedUIPickerVisibleChatAttachment
+Attachments Text:
+Project View content:
+```
+midterm
+ .venv
+ Dataset
+ Generated
+ Images
+  Figure1.png
+  Figure2.png
+  Figure3.png
+ Resources
+ .python-version
+ decode.csd
+ encode.csd
+ main.py
+ pyproject.toml
+ README.md
+ synth.py
+ uv.lock
+External Libraries
+Scratches and Consoles
+```
+Attachment Name: README.md
+Attachments Kind: Visible
+Attachments Source: RecentFilesRetriever / FileChatAttachment
+Attachments Text:
+```markdown
+# ML Midterm Project Documentation
+Ethan Bessette
+
+## Proposal
+
+### Vision
+Create a model that estimates synthesizer parameters to create patches that match target sounds.
+
+### PseudoCode
+
+![Architecture example](./Images/Figure2.png)
+
+From https://ieeexplore.ieee.org/document/10017350
+
+#### Differentiable synthesizer
+In Csound, I will design an FM synthesizer with 2 audio oscillators, 1 control oscillator, and one noise generator. They will all be able to modulate each other and themselves, like in FM8. Each will have an amplitude envelope.
+
+![FM8](./Images/Figure1.png)
+
+Even with few numbers of oscillators, a large number of sounds can be created. 
+
+https://drive.google.com/file/d/1FBpwcrP1YOWGa7a5kgqJJ4nyOe9Wz6hr/view?usp=sharing
+
+#### In-domain dataset
+All the differentiable parameters will be randomized and coupled with the synth's resulting audio output.
+This process will be automated in the terminal by generating random values to fill a csv for each differentiable synth parameter, reading the values into csound and saving the resulting audio along with the csv of parameters.
+
+#### Out of Domain dataset
+Additionally, audio that doesn't have coupled synth parameters will be used.
+
+#### Structure / Architecture
+This is an area that I have some questions and concerns about. One option is to follow the structure from the paper diagram I included above. On the other hand, I don't know enough about the various structures and optimization / training types.
+Because of this, I might use similar structure to what we've seen in class.
+
+I think if I decide on what structure to use conceptually, I would just need a generic example so I can change it to fit my needs.
+
+Ideas could include:
+Convolutional
+Multi head attention layers within transformer to find changes across time.
+
+##### Data comparisons
+I still have to learn how to use the calculated loss to optimize. I will review the nn_2 and 3 to see what optimization functions are used. For example, the loss of each individual synth parameter might be summed or averaged somehow into overall loss.
+
+For **audio spectral loss**, use MelSpectrogram. The number of bands can be adjusted, the window size, and hop length.
+
+![MelSpectrogram](./Images/Figure3.png)
+
+For **synth parameter loss**, each synth parameter will be normalized from 0 to 1 and the difference taken for each.
+
+
+#### Training
+The datasets will be divided 80-10-10 training validation testing.
+For in domain data, the loss between estimated synth parameters and real will be calculated and used to optimize.
+For all data, the audio spectral loss will be calculated by taking the difference of the MelSpectrogram of original and predicted audio and used to optimize.
+
+
+
+
+## Notepad
+Window of 4 chords, what is most likely next chord?
+Training:
+- 4 chords of song, give next chord
+
+So for audio, give a window of seconds and therefor x samples. Predict next y samples, add to output, move window
+
+Diffusion model
+Encoding: add noise to data over course of time steps until full noise.
+Train it to recognize where it is in timestep, therefore how much noise to remove to get back one tilmestep, repeat until back to original image
+It trains it to predict noise to remove per timestep until it gets an image that resembles the training images
+
+
+DDSP
+Train a model to control digital signal processing parameters to create a complex synthesizers given note pitch, velocity, and length
+- label training data with note pitch, velocity, and length
+- window of x notes of input (range of input length from 1 to maybe 4)
+
+Get output sound, match to original synthesizer, adjust sytnhezsizer parameters to reduce difference
+- gradient descent
+
+
+Calculating the loss change in output and input to gradient descent 
+- could be used for deep ANC
+
+https://realpython.com/gradient-descent-algorithm-python/
+This explains gradient descent. For a 2d vector (x,y) it finds a 1d vector, the minimum, by getting the gradient (the derivative of the 2d vector) and 
+
+
+The next chord predictor is probabilistic. It gets optimized 
+
+
+
+I could get samples of an instrument or my voice. Then
+DDSP
+Create structure of synthesizers and parameters. Randomize parameters, calculate loss, move parameters to minimize loss.
+I could calculate gradient descent of move input towards trained function
+For each audio sample, calculate difference of output to original
+
+
+One hot encoding aligns output with true correct answer in one hot encoding to determine loss.
+So for my model, it should have one output for each changeable synth parameter.
+
+
+## The Process
+
+### Dataset creation
+
+#### Csound
+I created a csound file that outputs 32 floating point wave files at each of 12 notes through the same synthesizer, naming them the index of the synth along with the note number. Outputting results in a dataset being generated that contains sets of 12 notes for each set of random synth parameters along with text files holding the synth parameters. As of now, I haven't found a way to output only the synth parameters, so the text file contains a header that will need to be discarded when cleaning data for machine learning training.
+
+There is an encode.csd file that generates parameters and creates audio for them, as well as a decode.csd that reads parameters and generates data. I tested them and it works. I also tested them on my own new parameters that I changed by hand.
+
+The next step will be figuring out how to get the .csd to run in the correct order in training. Also, training will take a long time unless I figure out how to make generating audio much faster for the amount of data I have.
+
+While the data is generating, I'm checking my activity monitor and it looks like processing is kept to 1 processor. I wonder if I could figure out multi threading to make it faster as well as forcing csound to make new instances instead of reusing them.
+
+##### Problems
+1. One problem was figuring out how to keep the pitch relatively constant during self modulation. When an oscillator self modulates its frequency, the pitch is perceived as lowering as the sidebands to the positive and negative are created. I researched ways to keep this constant and first kind Bessel functions were what came up. I tried to ask ChatGPT to help write functions to keep the pitch normal by calculating the spectral center as a function of f0 and self modulation index, but when I tried to implement it in Csound, it was too computationally expensive and sound froze every time. I spent a while finding a workaround and I ended up using a realtime polynomial function to approximate the amount of frequency offset within the range of parameters that I was using. It stops working at a certain point, but that doesn't matter since the way I programmed the synth it will never generate parameters outside that range. I also realized that a small amount of modulation by the original frequency helped to stabilize the pitch. I slightly modulate the frequency of the oscillator with a separate oscillator at its original frequency as a function of self-modulation index. While it adds some harmonics not present in true self-modulation, it doesn't matter.
+
+2. Another problem was figuring out how to keep the parameters constant while generating 12 different pitches of the same parameters. I ended up using two different scheduler instruments to do this. One scheduler spawns instances of the other scheduler so that synth sets can be generated in parallel. The other scheduler spawns 12 parallel instances of one set of parameters at different pitches. The instances themselves output the audio data, while the second scheduler holds the generated parameters and outputs them when done.
+
+3. Originally, the synth parameters were generated in each instance of a note. This obviously didn't work because what was supposed to be different pitches with the same parameters actually all had different parameters. To fix this, I generated each parameter from 0 to 1 in the 2nd scheduler instrument and set up the note instrument so that the scheduler could pass in the parameters when called. The note instrument can further process these normalized values. This allows the eventual machine learning algorithm to be able to output normalized values for the parameters which can be used to generate audio.
+
+4. It turns out Csound re-uses instances of instruments to save storage in memory. This was causing a problem where two clips were combined in one in the output audio. To solve this, I made sure to offset the parent scheduler so that it never created secondary schedulers at the same time. Note to self, I bet if I use more primary schedulers than the note length, I might have to change this so that it instantiates notes with a new identity instead of simply offsetting.
+    - Update, yes, this is the case. If I were to keep the note 5 seconds, that means I can only uses 5 instruments at a time. To generate 1000 sets of synth parameters, it would take 200 seconds to generate the dataset. Honestly that's reasonable, I'll keep it how it is for now. Nevermind 200 seconds only generates 200 examples. Def something I need to fix.
+
+5. The biggest problem is that I didn't understand that for ddsp to work, the synth has to be implemented in PyTorch.
+
+#### PyTorch
+I referenced the ddsp core.py library.
+
+I created a linear interpolation wavetable lookup function that takes in an index and returns an amplitude value based on the wavetable.
+
+I created an adsr generator that generates envelopes based on attack time, decay time, sustain time, sustain level, and release time. The time based parameters are loaded into a tensor, and softmax is applied so that the total time sums to one. Each value is then multiplied by the total number of samples to get the total time.
+
+I created an FM bank generator. Currently, it inits 2 audio tensors with zeros the length of total samples. It sets the phase of both to zero. Then, it works sample by sample:
+- calculate frequency from base frequency, ratios, previous audio tensor amplitude values, indexes
+- make the current audio sample equal the table lookup for the current phase
+- update the phase by adding its acceleration (it will always increase and wrap around 1. A higher frequency means the phase gets to 1 quicker / in larger steps. A lower frequency means it gets there in shorter steps)
+- output the audio with the values of out 1 and 2 scaled to sum to 1 to avoid clipping.
+It currently implements only modulating the other audio wave, no self modulation.
+
+
+#### DDSP
+Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters e2e differentiable.
+
+##### Original DDSP Library
+1. Preprocess raw audio
+    - detect fundamental frequency and loudness over time for 5 second clips of audio, store in a TFRecord file
+2. Save dataset stats so that future inputs can be processed to match training data
+    - pitch (f0), power, loudness, quantile transform.
+3. 
+
+
+
+##### My Implementation
+
+
+1. Break training audio into Mel spectrogram at time points, store in a data frame
+2. Save dateset stats
+3. 
+
+
+2. Given spectrogram,
+3. estimate synth parameters
+4. process audio tensor from those parameters, convert to Mel spectrogram
+5. Find loss between output and training Mel spectrogram
+6. Find loss between estimated and real synth parameters
+
+Flow of DDSP library:
+- preprocess raw audio into dataset
+    - detects 
+
+
+1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
+2. Uses those in additive to create pitched part of input
+3. Uses noise and filter to create unpatched
+4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio, 
+
+
+```
+
+
+kotlin.Unit
+
+==== UserMessageImpl #10 ====
+User: 
+csound
+# make a string variable that is the correctly formatted file name based on the input gifilenumber
+`Sparamfile sprintf "Generated/%04d.txt",gifilenumber`
+
+`def encode_from_file(file_number: int):`
+# parse the input file "Generated/%04d.txt" where %04d is the file_number
+# find everything after ---------END OF HEADER--------------
+# for the next 17 values, separated by new lines, return a list of the values
+
+Attachments:
+Attachment Name: Console Selection
+Attachments Kind: Visible
+Attachments Source: Other / SelectionChatAttachment
+Attachments Text:
+def encode_from_file(file_number: int):
+Attachment Name: Project View
+Attachments Kind: Visible
+Attachments Source: AutoUIPickerContextAttachmentSource / AutoloadedUIPickerVisibleChatAttachment
+Attachments Text:
+Project View content:
+```
+midterm
+ .venv
+ Dataset
+ Generated
+ Images
+  Figure1.png
+  Figure2.png
+  Figure3.png
+ Resources
+ .python-version
+ decode.csd
+ encode.csd
+ main.py
+ pyproject.toml
+ README.md
+ synth.py
+ uv.lock
+External Libraries
+Scratches and Consoles
+```
+Attachment Name: README.md
+Attachments Kind: Visible
+Attachments Source: RecentFilesRetriever / FileChatAttachment
+Attachments Text:
+```markdown
+# ML Midterm Project Documentation
+Ethan Bessette
+
+## Proposal
+
+### Vision
+Create a model that estimates synthesizer parameters to create patches that match target sounds.
+
+### PseudoCode
+
+![Architecture example](./Images/Figure2.png)
+
+From https://ieeexplore.ieee.org/document/10017350
+
+#### Differentiable synthesizer
+In Csound, I will design an FM synthesizer with 2 audio oscillators, 1 control oscillator, and one noise generator. They will all be able to modulate each other and themselves, like in FM8. Each will have an amplitude envelope.
+
+![FM8](./Images/Figure1.png)
+
+Even with few numbers of oscillators, a large number of sounds can be created. 
+
+https://drive.google.com/file/d/1FBpwcrP1YOWGa7a5kgqJJ4nyOe9Wz6hr/view?usp=sharing
+
+#### In-domain dataset
+All the differentiable parameters will be randomized and coupled with the synth's resulting audio output.
+This process will be automated in the terminal by generating random values to fill a csv for each differentiable synth parameter, reading the values into csound and saving the resulting audio along with the csv of parameters.
+
+#### Out of Domain dataset
+Additionally, audio that doesn't have coupled synth parameters will be used.
+
+#### Structure / Architecture
+This is an area that I have some questions and concerns about. One option is to follow the structure from the paper diagram I included above. On the other hand, I don't know enough about the various structures and optimization / training types.
+Because of this, I might use similar structure to what we've seen in class.
+
+I think if I decide on what structure to use conceptually, I would just need a generic example so I can change it to fit my needs.
+
+Ideas could include:
+Convolutional
+Multi head attention layers within transformer to find changes across time.
+
+##### Data comparisons
+I still have to learn how to use the calculated loss to optimize. I will review the nn_2 and 3 to see what optimization functions are used. For example, the loss of each individual synth parameter might be summed or averaged somehow into overall loss.
+
+For **audio spectral loss**, use MelSpectrogram. The number of bands can be adjusted, the window size, and hop length.
+
+![MelSpectrogram](./Images/Figure3.png)
+
+For **synth parameter loss**, each synth parameter will be normalized from 0 to 1 and the difference taken for each.
+
+
+#### Training
+The datasets will be divided 80-10-10 training validation testing.
+For in domain data, the loss between estimated synth parameters and real will be calculated and used to optimize.
+For all data, the audio spectral loss will be calculated by taking the difference of the MelSpectrogram of original and predicted audio and used to optimize.
+
+
+
+
+## Notepad
+Window of 4 chords, what is most likely next chord?
+Training:
+- 4 chords of song, give next chord
+
+So for audio, give a window of seconds and therefor x samples. Predict next y samples, add to output, move window
+
+Diffusion model
+Encoding: add noise to data over course of time steps until full noise.
+Train it to recognize where it is in timestep, therefore how much noise to remove to get back one tilmestep, repeat until back to original image
+It trains it to predict noise to remove per timestep until it gets an image that resembles the training images
+
+
+DDSP
+Train a model to control digital signal processing parameters to create a complex synthesizers given note pitch, velocity, and length
+- label training data with note pitch, velocity, and length
+- window of x notes of input (range of input length from 1 to maybe 4)
+
+Get output sound, match to original synthesizer, adjust sytnhezsizer parameters to reduce difference
+- gradient descent
+
+
+Calculating the loss change in output and input to gradient descent 
+- could be used for deep ANC
+
+https://realpython.com/gradient-descent-algorithm-python/
+This explains gradient descent. For a 2d vector (x,y) it finds a 1d vector, the minimum, by getting the gradient (the derivative of the 2d vector) and 
+
+
+The next chord predictor is probabilistic. It gets optimized 
+
+
+
+I could get samples of an instrument or my voice. Then
+DDSP
+Create structure of synthesizers and parameters. Randomize parameters, calculate loss, move parameters to minimize loss.
+I could calculate gradient descent of move input towards trained function
+For each audio sample, calculate difference of output to original
+
+
+One hot encoding aligns output with true correct answer in one hot encoding to determine loss.
+So for my model, it should have one output for each changeable synth parameter.
+
+
+## The Process
+
+### Dataset creation
+
+#### Csound
+I created a csound file that outputs 32 floating point wave files at each of 12 notes through the same synthesizer, naming them the index of the synth along with the note number. Outputting results in a dataset being generated that contains sets of 12 notes for each set of random synth parameters along with text files holding the synth parameters. As of now, I haven't found a way to output only the synth parameters, so the text file contains a header that will need to be discarded when cleaning data for machine learning training.
+
+There is an encode.csd file that generates parameters and creates audio for them, as well as a decode.csd that reads parameters and generates data. I tested them and it works. I also tested them on my own new parameters that I changed by hand.
+
+The next step will be figuring out how to get the .csd to run in the correct order in training. Also, training will take a long time unless I figure out how to make generating audio much faster for the amount of data I have.
+
+While the data is generating, I'm checking my activity monitor and it looks like processing is kept to 1 processor. I wonder if I could figure out multi threading to make it faster as well as forcing csound to make new instances instead of reusing them.
+
+##### Problems
+1. One problem was figuring out how to keep the pitch relatively constant during self modulation. When an oscillator self modulates its frequency, the pitch is perceived as lowering as the sidebands to the positive and negative are created. I researched ways to keep this constant and first kind Bessel functions were what came up. I tried to ask ChatGPT to help write functions to keep the pitch normal by calculating the spectral center as a function of f0 and self modulation index, but when I tried to implement it in Csound, it was too computationally expensive and sound froze every time. I spent a while finding a workaround and I ended up using a realtime polynomial function to approximate the amount of frequency offset within the range of parameters that I was using. It stops working at a certain point, but that doesn't matter since the way I programmed the synth it will never generate parameters outside that range. I also realized that a small amount of modulation by the original frequency helped to stabilize the pitch. I slightly modulate the frequency of the oscillator with a separate oscillator at its original frequency as a function of self-modulation index. While it adds some harmonics not present in true self-modulation, it doesn't matter.
+
+2. Another problem was figuring out how to keep the parameters constant while generating 12 different pitches of the same parameters. I ended up using two different scheduler instruments to do this. One scheduler spawns instances of the other scheduler so that synth sets can be generated in parallel. The other scheduler spawns 12 parallel instances of one set of parameters at different pitches. The instances themselves output the audio data, while the second scheduler holds the generated parameters and outputs them when done.
+
+3. Originally, the synth parameters were generated in each instance of a note. This obviously didn't work because what was supposed to be different pitches with the same parameters actually all had different parameters. To fix this, I generated each parameter from 0 to 1 in the 2nd scheduler instrument and set up the note instrument so that the scheduler could pass in the parameters when called. The note instrument can further process these normalized values. This allows the eventual machine learning algorithm to be able to output normalized values for the parameters which can be used to generate audio.
+
+4. It turns out Csound re-uses instances of instruments to save storage in memory. This was causing a problem where two clips were combined in one in the output audio. To solve this, I made sure to offset the parent scheduler so that it never created secondary schedulers at the same time. Note to self, I bet if I use more primary schedulers than the note length, I might have to change this so that it instantiates notes with a new identity instead of simply offsetting.
+    - Update, yes, this is the case. If I were to keep the note 5 seconds, that means I can only uses 5 instruments at a time. To generate 1000 sets of synth parameters, it would take 200 seconds to generate the dataset. Honestly that's reasonable, I'll keep it how it is for now. Nevermind 200 seconds only generates 200 examples. Def something I need to fix.
+
+5. The biggest problem is that I didn't understand that for ddsp to work, the synth has to be implemented in PyTorch.
+
+#### PyTorch
+I referenced the ddsp core.py library.
+
+I created a linear interpolation wavetable lookup function that takes in an index and returns an amplitude value based on the wavetable.
+
+I created an adsr generator that generates envelopes based on attack time, decay time, sustain time, sustain level, and release time. The time based parameters are loaded into a tensor, and softmax is applied so that the total time sums to one. Each value is then multiplied by the total number of samples to get the total time.
+
+I created an FM bank generator. Currently, it inits 2 audio tensors with zeros the length of total samples. It sets the phase of both to zero. Then, it works sample by sample:
+- calculate frequency from base frequency, ratios, previous audio tensor amplitude values, indexes
+- make the current audio sample equal the table lookup for the current phase
+- update the phase by adding its acceleration (it will always increase and wrap around 1. A higher frequency means the phase gets to 1 quicker / in larger steps. A lower frequency means it gets there in shorter steps)
+- output the audio with the values of out 1 and 2 scaled to sum to 1 to avoid clipping.
+It currently implements only modulating the other audio wave, no self modulation.
+
+
+#### DDSP
+Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters e2e differentiable.
+
+##### Original DDSP Library
+1. Preprocess raw audio
+    - detect fundamental frequency and loudness over time for 5 second clips of audio, store in a TFRecord file
+2. Save dataset stats so that future inputs can be processed to match training data
+    - pitch (f0), power, loudness, quantile transform.
+3. 
+
+
+
+##### My Implementation
+
+
+1. Break training audio into Mel spectrogram at time points, store in a data frame
+2. Save dateset stats
+3. 
+
+
+2. Given spectrogram,
+3. estimate synth parameters
+4. process audio tensor from those parameters, convert to Mel spectrogram
+5. Find loss between output and training Mel spectrogram
+6. Find loss between estimated and real synth parameters
+
+Flow of DDSP library:
+- preprocess raw audio into dataset
+    - detects 
+
+
+1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
+2. Uses those in additive to create pitched part of input
+3. Uses noise and filter to create unpatched
+4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio, 
+
+
+```
+
+
+kotlin.Unit
+
+==== SimpleCompletableMessage #11 ====
+Assistant: 
+For the Csound line, yes — that is the right idea.
+
+```csound
+Sparamfile sprintf "Generated/%04d.txt", gifilenumber
+```
+
+That makes filenames like:
+
+- `Generated/0001.txt`
+- `Generated/0042.txt`
+- `Generated/1234.txt`
+
+---
+
+For Python, here’s a clean version of `encode_from_file`:
+
+```python
+from pathlib import Path
+
+
+def encode_from_file(file_number: int):
+    path = Path(f"Generated/{file_number:04d}.txt")
+
+    with path.open("r") as f:
+        lines = f.readlines()
+
+    header_end = "---------END OF HEADER--------------\n"
+
+    try:
+        start = lines.index(header_end) + 1
+    except ValueError:
+        raise ValueError(f"Header end marker not found in {path}")
+
+    values = []
+    for line in lines[start:]:
+        line = line.strip()
+        if not line:
+            continue
+        values.append(float(line))
+        if len(values) == 17:
+            break
+
+    if len(values) != 17:
+        raise ValueError(f"Expected 17 values in {path}, found {len(values)}")
+
+    return values
+```
+
+## More robust version
+
+If the header line might have slightly different spacing/newline formatting, use this instead:
+
+```python
+from pathlib import Path
+
+
+def encode_from_file(file_number: int):
+    path = Path(f"Generated/{file_number:04d}.txt")
+
+    with path.open("r") as f:
+        lines = f.readlines()
+
+    start = None
+    for i, line in enumerate(lines):
+        if line.strip() == "---------END OF HEADER--------------":
+            start = i + 1
+            break
+
+    if start is None:
+        raise ValueError(f"Header end marker not found in {path}")
+
+    values = []
+    for line in lines[start:]:
+        line = line.strip()
+        if not line:
+            continue
+        values.append(float(line))
+        if len(values) == 17:
+            break
+
+    if len(values) != 17:
+        raise ValueError(f"Expected 17 values in {path}, found {len(values)}")
+
+    return values
+```
+
+## Example
+
+```python
+params = encode_from_file(7)
+print(params)
+```
+
+This will read:
+
+```python
+Generated/0007.txt
+```
+
+and return a list of 17 floats.
+
+## If you want names restored too
+
+If you have a fixed parameter order:
+
+```python
+PARAMS = [
+    "i1ratio", "i1index1", "i1index2", "i2index2", "i2index1",
+    "i1out", "i2out",
+    "iattack1", "idecay1", "isustaintime1", "isustain1", "irelease1",
+    "iattack2", "idecay2", "isustaintime2", "isustain2", "irelease2",
+]
+```
+
+then:
+
+```python
+decoded = dict(zip(PARAMS, encode_from_file(7)))
+```
+
+If you want, I can also write the matching `decode_to_file(...)` function that saves a processed 17-value list back into a Csound-readable text file.
+
+kotlin.Unit
+
+==== UserMessageImpl #12 ====
+User: 
+make a midi_to_freq dictionary
+Attachments:
+Attachment Name: Project View
+Attachments Kind: Visible
+Attachments Source: AutoUIPickerContextAttachmentSource / AutoloadedUIPickerVisibleChatAttachment
+Attachments Text:
+Project View content:
+```
+midterm
+ .venv
+ Dataset
+ Generated
+ Images
+  Figure1.png
+  Figure2.png
+  Figure3.png
+ Resources
+ .python-version
+ decode.csd
+ encode.csd
+ main.py
+ pyproject.toml
+ README.md
+ synth.py
+ uv.lock
+External Libraries
+Scratches and Consoles
+```
+Attachment Name: README.md
+Attachments Kind: Visible
+Attachments Source: RecentFilesRetriever / FileChatAttachment
+Attachments Text:
+```markdown
+# ML Midterm Project Documentation
+Ethan Bessette
+
+## Proposal
+
+### Vision
+Create a model that estimates synthesizer parameters to create patches that match target sounds.
+
+### PseudoCode
+
+![Architecture example](./Images/Figure2.png)
+
+From https://ieeexplore.ieee.org/document/10017350
+
+#### Differentiable synthesizer
+In Csound, I will design an FM synthesizer with 2 audio oscillators, 1 control oscillator, and one noise generator. They will all be able to modulate each other and themselves, like in FM8. Each will have an amplitude envelope.
+
+![FM8](./Images/Figure1.png)
+
+Even with few numbers of oscillators, a large number of sounds can be created. 
+
+https://drive.google.com/file/d/1FBpwcrP1YOWGa7a5kgqJJ4nyOe9Wz6hr/view?usp=sharing
+
+#### In-domain dataset
+All the differentiable parameters will be randomized and coupled with the synth's resulting audio output.
+This process will be automated in the terminal by generating random values to fill a csv for each differentiable synth parameter, reading the values into csound and saving the resulting audio along with the csv of parameters.
+
+#### Out of Domain dataset
+Additionally, audio that doesn't have coupled synth parameters will be used.
+
+#### Structure / Architecture
+This is an area that I have some questions and concerns about. One option is to follow the structure from the paper diagram I included above. On the other hand, I don't know enough about the various structures and optimization / training types.
+Because of this, I might use similar structure to what we've seen in class.
+
+I think if I decide on what structure to use conceptually, I would just need a generic example so I can change it to fit my needs.
+
+Ideas could include:
+Convolutional
+Multi head attention layers within transformer to find changes across time.
+
+##### Data comparisons
+I still have to learn how to use the calculated loss to optimize. I will review the nn_2 and 3 to see what optimization functions are used. For example, the loss of each individual synth parameter might be summed or averaged somehow into overall loss.
+
+For **audio spectral loss**, use MelSpectrogram. The number of bands can be adjusted, the window size, and hop length.
+
+![MelSpectrogram](./Images/Figure3.png)
+
+For **synth parameter loss**, each synth parameter will be normalized from 0 to 1 and the difference taken for each.
+
+
+#### Training
+The datasets will be divided 80-10-10 training validation testing.
+For in domain data, the loss between estimated synth parameters and real will be calculated and used to optimize.
+For all data, the audio spectral loss will be calculated by taking the difference of the MelSpectrogram of original and predicted audio and used to optimize.
+
+
+
+
+## Notepad
+Window of 4 chords, what is most likely next chord?
+Training:
+- 4 chords of song, give next chord
+
+So for audio, give a window of seconds and therefor x samples. Predict next y samples, add to output, move window
+
+Diffusion model
+Encoding: add noise to data over course of time steps until full noise.
+Train it to recognize where it is in timestep, therefore how much noise to remove to get back one tilmestep, repeat until back to original image
+It trains it to predict noise to remove per timestep until it gets an image that resembles the training images
+
+
+DDSP
+Train a model to control digital signal processing parameters to create a complex synthesizers given note pitch, velocity, and length
+- label training data with note pitch, velocity, and length
+- window of x notes of input (range of input length from 1 to maybe 4)
+
+Get output sound, match to original synthesizer, adjust sytnhezsizer parameters to reduce difference
+- gradient descent
+
+
+Calculating the loss change in output and input to gradient descent 
+- could be used for deep ANC
+
+https://realpython.com/gradient-descent-algorithm-python/
+This explains gradient descent. For a 2d vector (x,y) it finds a 1d vector, the minimum, by getting the gradient (the derivative of the 2d vector) and 
+
+
+The next chord predictor is probabilistic. It gets optimized 
+
+
+
+I could get samples of an instrument or my voice. Then
+DDSP
+Create structure of synthesizers and parameters. Randomize parameters, calculate loss, move parameters to minimize loss.
+I could calculate gradient descent of move input towards trained function
+For each audio sample, calculate difference of output to original
+
+
+One hot encoding aligns output with true correct answer in one hot encoding to determine loss.
+So for my model, it should have one output for each changeable synth parameter.
+
+
+## The Process
+
+### Dataset creation
+
+#### Csound
+I created a csound file that outputs 32 floating point wave files at each of 12 notes through the same synthesizer, naming them the index of the synth along with the note number. Outputting results in a dataset being generated that contains sets of 12 notes for each set of random synth parameters along with text files holding the synth parameters. As of now, I haven't found a way to output only the synth parameters, so the text file contains a header that will need to be discarded when cleaning data for machine learning training.
+
+There is an encode.csd file that generates parameters and creates audio for them, as well as a decode.csd that reads parameters and generates data. I tested them and it works. I also tested them on my own new parameters that I changed by hand.
+
+The next step will be figuring out how to get the .csd to run in the correct order in training. Also, training will take a long time unless I figure out how to make generating audio much faster for the amount of data I have.
+
+While the data is generating, I'm checking my activity monitor and it looks like processing is kept to 1 processor. I wonder if I could figure out multi threading to make it faster as well as forcing csound to make new instances instead of reusing them.
+
+##### Problems
+1. One problem was figuring out how to keep the pitch relatively constant during self modulation. When an oscillator self modulates its frequency, the pitch is perceived as lowering as the sidebands to the positive and negative are created. I researched ways to keep this constant and first kind Bessel functions were what came up. I tried to ask ChatGPT to help write functions to keep the pitch normal by calculating the spectral center as a function of f0 and self modulation index, but when I tried to implement it in Csound, it was too computationally expensive and sound froze every time. I spent a while finding a workaround and I ended up using a realtime polynomial function to approximate the amount of frequency offset within the range of parameters that I was using. It stops working at a certain point, but that doesn't matter since the way I programmed the synth it will never generate parameters outside that range. I also realized that a small amount of modulation by the original frequency helped to stabilize the pitch. I slightly modulate the frequency of the oscillator with a separate oscillator at its original frequency as a function of self-modulation index. While it adds some harmonics not present in true self-modulation, it doesn't matter.
+
+2. Another problem was figuring out how to keep the parameters constant while generating 12 different pitches of the same parameters. I ended up using two different scheduler instruments to do this. One scheduler spawns instances of the other scheduler so that synth sets can be generated in parallel. The other scheduler spawns 12 parallel instances of one set of parameters at different pitches. The instances themselves output the audio data, while the second scheduler holds the generated parameters and outputs them when done.
+
+3. Originally, the synth parameters were generated in each instance of a note. This obviously didn't work because what was supposed to be different pitches with the same parameters actually all had different parameters. To fix this, I generated each parameter from 0 to 1 in the 2nd scheduler instrument and set up the note instrument so that the scheduler could pass in the parameters when called. The note instrument can further process these normalized values. This allows the eventual machine learning algorithm to be able to output normalized values for the parameters which can be used to generate audio.
+
+4. It turns out Csound re-uses instances of instruments to save storage in memory. This was causing a problem where two clips were combined in one in the output audio. To solve this, I made sure to offset the parent scheduler so that it never created secondary schedulers at the same time. Note to self, I bet if I use more primary schedulers than the note length, I might have to change this so that it instantiates notes with a new identity instead of simply offsetting.
+    - Update, yes, this is the case. If I were to keep the note 5 seconds, that means I can only uses 5 instruments at a time. To generate 1000 sets of synth parameters, it would take 200 seconds to generate the dataset. Honestly that's reasonable, I'll keep it how it is for now. Nevermind 200 seconds only generates 200 examples. Def something I need to fix.
+
+5. The biggest problem is that I didn't understand that for ddsp to work, the synth has to be implemented in PyTorch.
+
+#### PyTorch
+I referenced the ddsp core.py library.
+
+I created a linear interpolation wavetable lookup function that takes in an index and returns an amplitude value based on the wavetable.
+
+I created an adsr generator that generates envelopes based on attack time, decay time, sustain time, sustain level, and release time. The time based parameters are loaded into a tensor, and softmax is applied so that the total time sums to one. Each value is then multiplied by the total number of samples to get the total time.
+
+I created an FM bank generator. Currently, it inits 2 audio tensors with zeros the length of total samples. It sets the phase of both to zero. Then, it works sample by sample:
+- calculate frequency from base frequency, ratios, previous audio tensor amplitude values, indexes
+- make the current audio sample equal the table lookup for the current phase
+- update the phase by adding its acceleration (it will always increase and wrap around 1. A higher frequency means the phase gets to 1 quicker / in larger steps. A lower frequency means it gets there in shorter steps)
+- output the audio with the values of out 1 and 2 scaled to sum to 1 to avoid clipping.
+It currently implements only modulating the other audio wave, no self modulation.
+
+
+#### DDSP
+Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters e2e differentiable.
+
+##### Original DDSP Library
+1. Preprocess raw audio
+    - detect fundamental frequency and loudness over time for 5 second clips of audio, store in a TFRecord file
+2. Save dataset stats so that future inputs can be processed to match training data
+    - pitch (f0), power, loudness, quantile transform.
+3. 
+
+
+
+##### My Implementation
+
+
+1. Break training audio into Mel spectrogram at time points, store in a data frame
+2. Save dateset stats
+3. 
+
+
+2. Given spectrogram,
+3. estimate synth parameters
+4. process audio tensor from those parameters, convert to Mel spectrogram
+5. Find loss between output and training Mel spectrogram
+6. Find loss between estimated and real synth parameters
+
+Flow of DDSP library:
+- preprocess raw audio into dataset
+    - detects 
+
+
+1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
+2. Uses those in additive to create pitched part of input
+3. Uses noise and filter to create unpatched
+4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio, 
+
+
+```
+
+
+kotlin.Unit
+
+==== SimpleCompletableMessage #13 ====
+Assistant: 
+Sure — the standard MIDI-to-frequency mapping is:
+
+\[
+f = 440.0 \cdot 2^{(midi - 69)/12}
+\]
+
+So a Python dictionary for all MIDI notes 0–127 is:
+
+```python
+midi_to_freq = {
+    midi: 440.0 * (2 ** ((midi - 69) / 12))
+    for midi in range(128)
+}
+```
+
+## Example
+
+```python
+print(midi_to_freq[69])  # 440.0
+print(midi_to_freq[60])  # 261.6255653005986
+print(midi_to_freq[72])  # 523.2511306011972
+```
+
+## If you want rounded values
+
+```python
+midi_to_freq = {
+    midi: round(440.0 * (2 ** ((midi - 69) / 12)), 6)
+    for midi in range(128)
+}
+```
+
+## If you also want the reverse helper
+
+A function is often better than only a dictionary:
+
+```python
+def midi_to_frequency(midi: int) -> float:
+    return 440.0 * (2 ** ((midi - 69) / 12))
+```
+
+Then:
+
+```python
+freq = midi_to_frequency(60)
+```
+
+## Best recommendation
+
+Use both:
+
+```python
+def midi_to_frequency(midi: int) -> float:
+    return 440.0 * (2 ** ((midi - 69) / 12))
+
+midi_to_freq = {midi: midi_to_frequency(midi) for midi in range(128)}
+```
+
+If you want, I can also make:
+- `freq_to_midi`
+- a dictionary with note names like `"C4": 261.63`
+- or a PyTorch tensor version for fast lookup in training code.
+
+kotlin.Unit
+
+==== UserMessageImpl #14 ====
+User: 
+save audio to a file
+Attachments:
+Attachment Name: Console Selection
+Attachments Kind: Visible
+Attachments Source: Other / SelectionChatAttachment
+Attachments Text:
+midi_to_freq = {
+    midi: 440.0 * (2 ** ((midi - 69) / 12))
+    for midi in range(128)
+}
+Attachment Name: Console Selection
+Attachments Kind: Visible
+Attachments Source: Other / SelectionChatAttachment
+Attachments Text:
+audio = synth.fm_bank(midi_to_freq[57],float(params[0]),1.0,float(params[2]),float(params[4]),float(params[5]),float(params[6]),k1,k2,wavetable,num_samples,sample_rate)
+show_waveform(audio)
+specplot(audio)
+play_audio(audio, sample_rate)
+Attachment Name: README.md
+Attachments Kind: Visible
+Attachments Source: RecentFilesRetriever / FileChatAttachment
+Attachments Text:
+```markdown
+# ML Midterm Project Documentation
+Ethan Bessette
+
+## Proposal
+
+### Vision
+Create a model that estimates synthesizer parameters to create patches that match target sounds.
+
+### PseudoCode
+
+![Architecture example](./Images/Figure2.png)
+
+From https://ieeexplore.ieee.org/document/10017350
+
+#### Differentiable synthesizer
+In Csound, I will design an FM synthesizer with 2 audio oscillators, 1 control oscillator, and one noise generator. They will all be able to modulate each other and themselves, like in FM8. Each will have an amplitude envelope.
+
+![FM8](./Images/Figure1.png)
+
+Even with few numbers of oscillators, a large number of sounds can be created. 
+
+https://drive.google.com/file/d/1FBpwcrP1YOWGa7a5kgqJJ4nyOe9Wz6hr/view?usp=sharing
+
+#### In-domain dataset
+All the differentiable parameters will be randomized and coupled with the synth's resulting audio output.
+This process will be automated in the terminal by generating random values to fill a csv for each differentiable synth parameter, reading the values into csound and saving the resulting audio along with the csv of parameters.
+
+#### Out of Domain dataset
+Additionally, audio that doesn't have coupled synth parameters will be used.
+
+#### Structure / Architecture
+This is an area that I have some questions and concerns about. One option is to follow the structure from the paper diagram I included above. On the other hand, I don't know enough about the various structures and optimization / training types.
+Because of this, I might use similar structure to what we've seen in class.
+
+I think if I decide on what structure to use conceptually, I would just need a generic example so I can change it to fit my needs.
+
+Ideas could include:
+Convolutional
+Multi head attention layers within transformer to find changes across time.
+
+##### Data comparisons
+I still have to learn how to use the calculated loss to optimize. I will review the nn_2 and 3 to see what optimization functions are used. For example, the loss of each individual synth parameter might be summed or averaged somehow into overall loss.
+
+For **audio spectral loss**, use MelSpectrogram. The number of bands can be adjusted, the window size, and hop length.
+
+![MelSpectrogram](./Images/Figure3.png)
+
+For **synth parameter loss**, each synth parameter will be normalized from 0 to 1 and the difference taken for each.
+
+
+#### Training
+The datasets will be divided 80-10-10 training validation testing.
+For in domain data, the loss between estimated synth parameters and real will be calculated and used to optimize.
+For all data, the audio spectral loss will be calculated by taking the difference of the MelSpectrogram of original and predicted audio and used to optimize.
+
+
+
+
+## Notepad
+Window of 4 chords, what is most likely next chord?
+Training:
+- 4 chords of song, give next chord
+
+So for audio, give a window of seconds and therefor x samples. Predict next y samples, add to output, move window
+
+Diffusion model
+Encoding: add noise to data over course of time steps until full noise.
+Train it to recognize where it is in timestep, therefore how much noise to remove to get back one tilmestep, repeat until back to original image
+It trains it to predict noise to remove per timestep until it gets an image that resembles the training images
+
+
+DDSP
+Train a model to control digital signal processing parameters to create a complex synthesizers given note pitch, velocity, and length
+- label training data with note pitch, velocity, and length
+- window of x notes of input (range of input length from 1 to maybe 4)
+
+Get output sound, match to original synthesizer, adjust sytnhezsizer parameters to reduce difference
+- gradient descent
+
+
+Calculating the loss change in output and input to gradient descent 
+- could be used for deep ANC
+
+https://realpython.com/gradient-descent-algorithm-python/
+This explains gradient descent. For a 2d vector (x,y) it finds a 1d vector, the minimum, by getting the gradient (the derivative of the 2d vector) and 
+
+
+The next chord predictor is probabilistic. It gets optimized 
+
+
+
+I could get samples of an instrument or my voice. Then
+DDSP
+Create structure of synthesizers and parameters. Randomize parameters, calculate loss, move parameters to minimize loss.
+I could calculate gradient descent of move input towards trained function
+For each audio sample, calculate difference of output to original
+
+
+One hot encoding aligns output with true correct answer in one hot encoding to determine loss.
+So for my model, it should have one output for each changeable synth parameter.
+
+
+## The Process
+
+### Dataset creation
+
+#### Csound
+I created a csound file that outputs 32 floating point wave files at each of 12 notes through the same synthesizer, naming them the index of the synth along with the note number. Outputting results in a dataset being generated that contains sets of 12 notes for each set of random synth parameters along with text files holding the synth parameters. As of now, I haven't found a way to output only the synth parameters, so the text file contains a header that will need to be discarded when cleaning data for machine learning training.
+
+There is an encode.csd file that generates parameters and creates audio for them, as well as a decode.csd that reads parameters and generates data. I tested them and it works. I also tested them on my own new parameters that I changed by hand.
+
+The next step will be figuring out how to get the .csd to run in the correct order in training. Also, training will take a long time unless I figure out how to make generating audio much faster for the amount of data I have.
+
+While the data is generating, I'm checking my activity monitor and it looks like processing is kept to 1 processor. I wonder if I could figure out multi threading to make it faster as well as forcing csound to make new instances instead of reusing them.
+
+##### Problems
+1. One problem was figuring out how to keep the pitch relatively constant during self modulation. When an oscillator self modulates its frequency, the pitch is perceived as lowering as the sidebands to the positive and negative are created. I researched ways to keep this constant and first kind Bessel functions were what came up. I tried to ask ChatGPT to help write functions to keep the pitch normal by calculating the spectral center as a function of f0 and self modulation index, but when I tried to implement it in Csound, it was too computationally expensive and sound froze every time. I spent a while finding a workaround and I ended up using a realtime polynomial function to approximate the amount of frequency offset within the range of parameters that I was using. It stops working at a certain point, but that doesn't matter since the way I programmed the synth it will never generate parameters outside that range. I also realized that a small amount of modulation by the original frequency helped to stabilize the pitch. I slightly modulate the frequency of the oscillator with a separate oscillator at its original frequency as a function of self-modulation index. While it adds some harmonics not present in true self-modulation, it doesn't matter.
+
+2. Another problem was figuring out how to keep the parameters constant while generating 12 different pitches of the same parameters. I ended up using two different scheduler instruments to do this. One scheduler spawns instances of the other scheduler so that synth sets can be generated in parallel. The other scheduler spawns 12 parallel instances of one set of parameters at different pitches. The instances themselves output the audio data, while the second scheduler holds the generated parameters and outputs them when done.
+
+3. Originally, the synth parameters were generated in each instance of a note. This obviously didn't work because what was supposed to be different pitches with the same parameters actually all had different parameters. To fix this, I generated each parameter from 0 to 1 in the 2nd scheduler instrument and set up the note instrument so that the scheduler could pass in the parameters when called. The note instrument can further process these normalized values. This allows the eventual machine learning algorithm to be able to output normalized values for the parameters which can be used to generate audio.
+
+4. It turns out Csound re-uses instances of instruments to save storage in memory. This was causing a problem where two clips were combined in one in the output audio. To solve this, I made sure to offset the parent scheduler so that it never created secondary schedulers at the same time. Note to self, I bet if I use more primary schedulers than the note length, I might have to change this so that it instantiates notes with a new identity instead of simply offsetting.
+    - Update, yes, this is the case. If I were to keep the note 5 seconds, that means I can only uses 5 instruments at a time. To generate 1000 sets of synth parameters, it would take 200 seconds to generate the dataset. Honestly that's reasonable, I'll keep it how it is for now. Nevermind 200 seconds only generates 200 examples. Def something I need to fix.
+
+5. The biggest problem is that I didn't understand that for ddsp to work, the synth has to be implemented in PyTorch.
+
+#### PyTorch
+I referenced the ddsp core.py library.
+
+I created a linear interpolation wavetable lookup function that takes in an index and returns an amplitude value based on the wavetable.
+
+I created an adsr generator that generates envelopes based on attack time, decay time, sustain time, sustain level, and release time. The time based parameters are loaded into a tensor, and softmax is applied so that the total time sums to one. Each value is then multiplied by the total number of samples to get the total time.
+
+I created an FM bank generator. Currently, it inits 2 audio tensors with zeros the length of total samples. It sets the phase of both to zero. Then, it works sample by sample:
+- calculate frequency from base frequency, ratios, previous audio tensor amplitude values, indexes
+- make the current audio sample equal the table lookup for the current phase
+- update the phase by adding its acceleration (it will always increase and wrap around 1. A higher frequency means the phase gets to 1 quicker / in larger steps. A lower frequency means it gets there in shorter steps)
+- output the audio with the values of out 1 and 2 scaled to sum to 1 to avoid clipping.
+It currently implements only modulating the other audio wave, no self modulation.
+
+
+#### DDSP
+Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters e2e differentiable.
+
+##### Original DDSP Library
+1. Preprocess raw audio
+    - detect fundamental frequency and loudness over time for 5 second clips of audio, store in a TFRecord file
+2. Save dataset stats so that future inputs can be processed to match training data
+    - pitch (f0), power, loudness, quantile transform.
+3. 
+
+
+
+##### My Implementation
+
+
+1. Break training audio into Mel spectrogram at time points, store in a data frame
+2. Save dateset stats
+3. 
+
+
+2. Given spectrogram,
+3. estimate synth parameters
+4. process audio tensor from those parameters, convert to Mel spectrogram
+5. Find loss between output and training Mel spectrogram
+6. Find loss between estimated and real synth parameters
+
+Flow of DDSP library:
+- preprocess raw audio into dataset
+    - detects 
+
+
+1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
+2. Uses those in additive to create pitched part of input
+3. Uses noise and filter to create unpatched
+4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio, 
+
+
+```
+
+
+kotlin.Unit
+
+==== SimpleCompletableMessage #15 ====
+Assistant: 
+Use `scipy.io.wavfile.write`.
+
+```python
+import torch
+import numpy as np
+from scipy.io import wavfile
+
+
+def save_audio(audio, sample_rate, path):
+    if isinstance(audio, torch.Tensor):
+        audio = audio.detach().cpu().float().numpy()
+    else:
+        audio = np.asarray(audio, dtype=np.float32)
+
+    if audio.ndim == 2:
+        audio = audio[0]
+
+    audio = np.clip(audio, -1.0, 1.0)
+    audio_int16 = (audio * 32767).astype(np.int16)
+
+    wavfile.write(path, sample_rate, audio_int16)
+    print(f"saved {path}")
+```
+
+Example with your audio:
+
+```python
+audio = synth.fm_bank(
+    midi_to_freq[57],
+    float(params[0]),
+    1.0,
+    float(params[2]),
+    float(params[4]),
+    float(params[5]),
+    float(params[6]),
+    k1,
+    k2,
+    wavetable,
+    num_samples,
+    sample_rate,
+)
+
+save_audio(audio, sample_rate, "test.wav")
+```
+
+If you want the file in a folder:
+
+```python
+save_audio(audio, sample_rate, "Generated/test.wav")
+```
+
+If you want, I can also give you:
+- a version that saves **32-bit float wav**
+- a version that auto-names files like `Generated/0007_57.wav`
+
+kotlin.Unit
+
+==== UserMessageImpl #16 ====
+User: 
+yes
+Attachments:
+Attachment Name: Project View
+Attachments Kind: Visible
+Attachments Source: AutoUIPickerContextAttachmentSource / AutoloadedUIPickerVisibleChatAttachment
+Attachments Text:
+Project View content:
+```
+midterm
+ .venv
+ Dataset
+ Generated
+ Images
+  Figure1.png
+  Figure2.png
+  Figure3.png
+ Resources
+ .python-version
+ decode.csd
+ encode.csd
+ main.py
+ pyproject.toml
+ README.md
+ synth.py
+ uv.lock
+External Libraries
+Scratches and Consoles
+```
+Attachment Name: synth.py
+Attachments Kind: Visible
+Attachments Source: RecentFilesRetriever / FileChatAttachment
+Attachments Text:
+```python
+#%%
+import torch
+import math
+
+#%%
+def adsr(a: float, d: float, s_time: float, sustain_level: float, r: float, num_samples: int, sample_rate: int):
+    adstr = torch.tensor([a,d,s_time,r])
+    adstr = torch.softmax(adstr, dim=0)
+    attack = torch.linspace(0.0,1.0, int(num_samples*adstr[0]))
+    decay = torch.linspace(1.0, sustain_level, int(num_samples*adstr[1]))
+    sustain = torch.linspace(sustain_level, sustain_level, int(num_samples*adstr[2]))
+
+    parameters = [attack, decay, sustain]
+    envelope = torch.concat(parameters, dim=0)
+    release = torch.linspace(sustain_level, 0.0, num_samples-len(envelope))
+    envelope = torch.concat([envelope, release], dim=0)
+
+    return envelope
+
+#%%
+def linear_lookup(phase: float, wavetable: torch.Tensor):
+    phase = float(phase) % 1.0
+
+    extended = torch.cat([wavetable, wavetable[:1]], dim=0)
+    table_size = wavetable.shape[0]
+
+    index = phase * table_size
+    i0 = int(math.floor(index))
+    i1 = i0 + 1
+    frac = index - i0
+
+    return extended[i0] * (1.0 - frac) + extended[i1] * frac
+
+
+#%%
+def fm_bank(base_freq: float, ratio1: float, ratio2: float, i1index2: float, i2index1: float, iout1: float, iout2: float, adsr1: torch.Tensor, adsr2: torch.Tensor, wavetable: torch.Tensor, num_samples: int, sample_rate: int):
+    ratio1 = ratio1 * 16
+    i1index2 = i1index2 * 14.5
+    i2index1 = i2index1 * 14.5
+
+    a1 = torch.zeros((num_samples))
+    a2 = torch.zeros((num_samples))
+    phase1 = 0
+    phase2 = 0
+
+    for sample in range(num_samples):
+        if sample == 0:
+            freq1 = base_freq * ratio1
+            freq2 = base_freq * ratio2
+        else:
+            freq1 = (base_freq * ratio1)*(1 + float(a2[sample-1]) * i2index1)
+            freq2 = (base_freq * ratio2)*(1 + float(a1[sample-1]) * i1index2)
+
+        if sample % 1000 == 0:
+            print(freq1, freq2)
+
+        a1[sample] = linear_lookup(phase1, wavetable)
+        a1[sample] = a1[sample] * adsr1[sample]
+
+        a2[sample] = linear_lookup(phase2, wavetable)
+        a2[sample] = a2[sample] * adsr2[sample]
+
+        phase1 = (phase1 + freq1 / float(sample_rate)) % 1.0
+        phase2 = (phase2 + freq2 / float(sample_rate)) % 1.0
+
+    aout = a1 * (iout1 / (iout1 + iout2)) + a2 * (iout2 / (iout1 + iout2))
+    return aout
+```
+Attachment Name: README.md
+Attachments Kind: Visible
+Attachments Source: RecentFilesRetriever / FileChatAttachment
+Attachments Text:
+```markdown
+# ML Midterm Project Documentation
+Ethan Bessette
+
+## Proposal
+
+### Vision
+Create a model that estimates synthesizer parameters to create patches that match target sounds.
+
+### PseudoCode
+
+![Architecture example](./Images/Figure2.png)
+
+From https://ieeexplore.ieee.org/document/10017350
+
+#### Differentiable synthesizer
+In Csound, I will design an FM synthesizer with 2 audio oscillators, 1 control oscillator, and one noise generator. They will all be able to modulate each other and themselves, like in FM8. Each will have an amplitude envelope.
+
+![FM8](./Images/Figure1.png)
+
+Even with few numbers of oscillators, a large number of sounds can be created. 
+
+https://drive.google.com/file/d/1FBpwcrP1YOWGa7a5kgqJJ4nyOe9Wz6hr/view?usp=sharing
+
+#### In-domain dataset
+All the differentiable parameters will be randomized and coupled with the synth's resulting audio output.
+This process will be automated in the terminal by generating random values to fill a csv for each differentiable synth parameter, reading the values into csound and saving the resulting audio along with the csv of parameters.
+
+#### Out of Domain dataset
+Additionally, audio that doesn't have coupled synth parameters will be used.
+
+#### Structure / Architecture
+This is an area that I have some questions and concerns about. One option is to follow the structure from the paper diagram I included above. On the other hand, I don't know enough about the various structures and optimization / training types.
+Because of this, I might use similar structure to what we've seen in class.
+
+I think if I decide on what structure to use conceptually, I would just need a generic example so I can change it to fit my needs.
+
+Ideas could include:
+Convolutional
+Multi head attention layers within transformer to find changes across time.
+
+##### Data comparisons
+I still have to learn how to use the calculated loss to optimize. I will review the nn_2 and 3 to see what optimization functions are used. For example, the loss of each individual synth parameter might be summed or averaged somehow into overall loss.
+
+For **audio spectral loss**, use MelSpectrogram. The number of bands can be adjusted, the window size, and hop length.
+
+![MelSpectrogram](./Images/Figure3.png)
+
+For **synth parameter loss**, each synth parameter will be normalized from 0 to 1 and the difference taken for each.
+
+
+#### Training
+The datasets will be divided 80-10-10 training validation testing.
+For in domain data, the loss between estimated synth parameters and real will be calculated and used to optimize.
+For all data, the audio spectral loss will be calculated by taking the difference of the MelSpectrogram of original and predicted audio and used to optimize.
+
+
+
+
+## Notepad
+Window of 4 chords, what is most likely next chord?
+Training:
+- 4 chords of song, give next chord
+
+So for audio, give a window of seconds and therefor x samples. Predict next y samples, add to output, move window
+
+Diffusion model
+Encoding: add noise to data over course of time steps until full noise.
+Train it to recognize where it is in timestep, therefore how much noise to remove to get back one tilmestep, repeat until back to original image
+It trains it to predict noise to remove per timestep until it gets an image that resembles the training images
+
+
+DDSP
+Train a model to control digital signal processing parameters to create a complex synthesizers given note pitch, velocity, and length
+- label training data with note pitch, velocity, and length
+- window of x notes of input (range of input length from 1 to maybe 4)
+
+Get output sound, match to original synthesizer, adjust sytnhezsizer parameters to reduce difference
+- gradient descent
+
+
+Calculating the loss change in output and input to gradient descent 
+- could be used for deep ANC
+
+https://realpython.com/gradient-descent-algorithm-python/
+This explains gradient descent. For a 2d vector (x,y) it finds a 1d vector, the minimum, by getting the gradient (the derivative of the 2d vector) and 
+
+
+The next chord predictor is probabilistic. It gets optimized 
+
+
+
+I could get samples of an instrument or my voice. Then
+DDSP
+Create structure of synthesizers and parameters. Randomize parameters, calculate loss, move parameters to minimize loss.
+I could calculate gradient descent of move input towards trained function
+For each audio sample, calculate difference of output to original
+
+
+One hot encoding aligns output with true correct answer in one hot encoding to determine loss.
+So for my model, it should have one output for each changeable synth parameter.
+
+
+## The Process
+
+### Dataset creation
+
+#### Csound
+I created a csound file that outputs 32 floating point wave files at each of 12 notes through the same synthesizer, naming them the index of the synth along with the note number. Outputting results in a dataset being generated that contains sets of 12 notes for each set of random synth parameters along with text files holding the synth parameters. As of now, I haven't found a way to output only the synth parameters, so the text file contains a header that will need to be discarded when cleaning data for machine learning training.
+
+There is an encode.csd file that generates parameters and creates audio for them, as well as a decode.csd that reads parameters and generates data. I tested them and it works. I also tested them on my own new parameters that I changed by hand.
+
+The next step will be figuring out how to get the .csd to run in the correct order in training. Also, training will take a long time unless I figure out how to make generating audio much faster for the amount of data I have.
+
+While the data is generating, I'm checking my activity monitor and it looks like processing is kept to 1 processor. I wonder if I could figure out multi threading to make it faster as well as forcing csound to make new instances instead of reusing them.
+
+##### Problems
+1. One problem was figuring out how to keep the pitch relatively constant during self modulation. When an oscillator self modulates its frequency, the pitch is perceived as lowering as the sidebands to the positive and negative are created. I researched ways to keep this constant and first kind Bessel functions were what came up. I tried to ask ChatGPT to help write functions to keep the pitch normal by calculating the spectral center as a function of f0 and self modulation index, but when I tried to implement it in Csound, it was too computationally expensive and sound froze every time. I spent a while finding a workaround and I ended up using a realtime polynomial function to approximate the amount of frequency offset within the range of parameters that I was using. It stops working at a certain point, but that doesn't matter since the way I programmed the synth it will never generate parameters outside that range. I also realized that a small amount of modulation by the original frequency helped to stabilize the pitch. I slightly modulate the frequency of the oscillator with a separate oscillator at its original frequency as a function of self-modulation index. While it adds some harmonics not present in true self-modulation, it doesn't matter.
+
+2. Another problem was figuring out how to keep the parameters constant while generating 12 different pitches of the same parameters. I ended up using two different scheduler instruments to do this. One scheduler spawns instances of the other scheduler so that synth sets can be generated in parallel. The other scheduler spawns 12 parallel instances of one set of parameters at different pitches. The instances themselves output the audio data, while the second scheduler holds the generated parameters and outputs them when done.
+
+3. Originally, the synth parameters were generated in each instance of a note. This obviously didn't work because what was supposed to be different pitches with the same parameters actually all had different parameters. To fix this, I generated each parameter from 0 to 1 in the 2nd scheduler instrument and set up the note instrument so that the scheduler could pass in the parameters when called. The note instrument can further process these normalized values. This allows the eventual machine learning algorithm to be able to output normalized values for the parameters which can be used to generate audio.
+
+4. It turns out Csound re-uses instances of instruments to save storage in memory. This was causing a problem where two clips were combined in one in the output audio. To solve this, I made sure to offset the parent scheduler so that it never created secondary schedulers at the same time. Note to self, I bet if I use more primary schedulers than the note length, I might have to change this so that it instantiates notes with a new identity instead of simply offsetting.
+    - Update, yes, this is the case. If I were to keep the note 5 seconds, that means I can only uses 5 instruments at a time. To generate 1000 sets of synth parameters, it would take 200 seconds to generate the dataset. Honestly that's reasonable, I'll keep it how it is for now. Nevermind 200 seconds only generates 200 examples. Def something I need to fix.
+
+5. The biggest problem is that I didn't understand that for ddsp to work, the synth has to be implemented in PyTorch.
+
+#### PyTorch
+I referenced the ddsp core.py library.
+
+I created a linear interpolation wavetable lookup function that takes in an index and returns an amplitude value based on the wavetable.
+
+I created an adsr generator that generates envelopes based on attack time, decay time, sustain time, sustain level, and release time. The time based parameters are loaded into a tensor, and softmax is applied so that the total time sums to one. Each value is then multiplied by the total number of samples to get the total time.
+
+I created an FM bank generator. Currently, it inits 2 audio tensors with zeros the length of total samples. It sets the phase of both to zero. Then, it works sample by sample:
+- calculate frequency from base frequency, ratios, previous audio tensor amplitude values, indexes
+- make the current audio sample equal the table lookup for the current phase
+- update the phase by adding its acceleration (it will always increase and wrap around 1. A higher frequency means the phase gets to 1 quicker / in larger steps. A lower frequency means it gets there in shorter steps)
+- output the audio with the values of out 1 and 2 scaled to sum to 1 to avoid clipping.
+It currently implements only modulating the other audio wave, no self modulation.
+
+
+#### DDSP
+Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters e2e differentiable.
+
+##### Original DDSP Library
+1. Preprocess raw audio
+    - detect fundamental frequency and loudness over time for 5 second clips of audio, store in a TFRecord file
+2. Save dataset stats so that future inputs can be processed to match training data
+    - pitch (f0), power, loudness, quantile transform.
+3. 
+
+
+
+##### My Implementation
+
+
+1. Break training audio into Mel spectrogram at time points, store in a data frame
+2. Save dateset stats
+3. 
+
+
+2. Given spectrogram,
+3. estimate synth parameters
+4. process audio tensor from those parameters, convert to Mel spectrogram
+5. Find loss between output and training Mel spectrogram
+6. Find loss between estimated and real synth parameters
+
+Flow of DDSP library:
+- preprocess raw audio into dataset
+    - detects 
+
+
+1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
+2. Uses those in additive to create pitched part of input
+3. Uses noise and filter to create unpatched
+4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio, 
+
+
+```
+
+
+kotlin.Unit
+
+==== SimpleCompletableMessage #17 ====
+Assistant: 
+Here are both versions.
+
+## Save as 16-bit PCM wav
+
+```python
+from pathlib import Path
+import torch
+import numpy as np
+from scipy.io import wavfile
+
+
+def save_audio_int16(audio, sample_rate, path):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    if isinstance(audio, torch.Tensor):
+        audio = audio.detach().cpu().float().numpy()
+    else:
+        audio = np.asarray(audio, dtype=np.float32)
+
+    if audio.ndim == 2:
+        audio = audio[0]
+
+    audio = np.clip(audio, -1.0, 1.0)
+    audio_int16 = (audio * 32767).astype(np.int16)
+
+    wavfile.write(path, sample_rate, audio_int16)
+    print(f"saved {path}")
+```
+
+## Save as 32-bit float wav
+
+This keeps your synthesized values as floats.
+
+```python
+from pathlib import Path
+import torch
+import numpy as np
+from scipy.io import wavfile
+
+
+def save_audio_float32(audio, sample_rate, path):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    if isinstance(audio, torch.Tensor):
+        audio = audio.detach().cpu().float().numpy()
+    else:
+        audio = np.asarray(audio, dtype=np.float32)
+
+    if audio.ndim == 2:
+        audio = audio[0]
+
+    audio = np.asarray(audio, dtype=np.float32)
+    wavfile.write(path, sample_rate, audio)
+    print(f"saved {path}")
+```
+
+## Auto-name files like `Generated/0007_57.wav`
+
+```python
+from pathlib import Path
+
+
+def make_audio_path(file_number: int, midi_note: int, folder="Generated"):
+    return Path(folder) / f"{file_number:04d}_{midi_note}.wav"
+```
+
+Example:
+
+```python
+path = make_audio_path(7, 57)
+print(path)
+```
+
+Output:
+
+```python
+Generated/0007_57.wav
+```
+
+## Example usage
+
+```python
+audio = synth.fm_bank(
+    midi_to_freq[57],
+    float(params[0]),
+    1.0,
+    float(params[2]),
+    float(params[4]),
+    float(params[5]),
+    float(params[6]),
+    k1,
+    k2,
+    wavetable,
+    num_samples,
+    sample_rate,
+)
+
+save_audio_int16(audio, sample_rate, make_audio_path(7, 57))
+```
+
+Or float wav:
+
+```python
+save_audio_float32(audio, sample_rate, make_audio_path(7, 57))
+```
+
+## Recommendation
+
+- use **int16** if you want maximum compatibility with players
+- use **float32** if you want to preserve synthesis output more faithfully for analysis/debugging
+
+If you want, I can combine these into one function like:
+
+```python
+save_audio(audio, sample_rate, file_number=7, midi_note=57, float_wav=True)
+```
+
+so you only call one helper.
+
+kotlin.Unit
+
+==== UserMessageImpl #18 ====
+User: 
+# I have a labeled dataset that contains text files with synth parameters and their output audio in 32 bit float wav
+# multiple audio files share synth parameters, with only their f0 changing
+# I want to convert this dataset into something readable by a ML algorithm by analyzing the audio using melspectrogram with 128 bands, an FFT size of 1024 samples and a hop size of 256 samples (these should be hyperparameters)
+# the dataset will be split 80:20, 80% training, 20% testing
+# batch and epoch processing (batch and epoch are hyperparameters)
+# for training: 
+# spectrogram frames will enter 3 layers of 1d convolution network with batch normalization after each layer
+# the output will enter a GRU layer with 1024 units (a hyperparameter)
+# finally, the output will enter a linear layer with 17 outputs (one for each synth parameter)
+# the values of each synth parameter will be used to generate resulting audio:
+```python
+k1 = synth.adsr(float(params[7]), float(params[8]), float(params[9]), float(params[10]), float(params[11]), num_samples, sample_rate)
+k2 = synth.adsr(float(params[12]), float(params[13]), float(params[14]), float(params[15]), float(params[16]), num_samples, sample_rate)
+```
+`audio = synth.fm_bank(midi_to_freq[57],float(params[0]),1.0,float(params[2]),float(params[4]),float(params[5]),float(params[6]),k1,k2,wavetable,num_samples,sample_rate)`
+Attachments:
+Attachment Name: Console Selection
+Attachments Kind: Visible
+Attachments Source: Other / SelectionChatAttachment
+Attachments Text:
+audio = synth.fm_bank(midi_to_freq[57],float(params[0]),1.0,float(params[2]),float(params[4]),float(params[5]),float(params[6]),k1,k2,wavetable,num_samples,sample_rate)
+Attachment Name: Project View
+Attachments Kind: Visible
+Attachments Source: AutoUIPickerContextAttachmentSource / AutoloadedUIPickerVisibleChatAttachment
+Attachments Text:
+Project View content:
+```
+midterm
+ .venv
+ Dataset
+ Generated
+ Images
+  Figure1.png
+  Figure2.png
+  Figure3.png
+ Resources
+ .python-version
+ decode.csd
+ encode.csd
+ main.py
+ pyproject.toml
+ README.md
+ synth.py
+ uv.lock
+External Libraries
+Scratches and Consoles
+```
+Attachment Name: synth.py
+Attachments Kind: Visible
+Attachments Source: RecentFilesRetriever / FileChatAttachment
+Attachments Text:
+```python
+#%%
+import torch
+import math
+
+#%%
+def adsr(a: float, d: float, s_time: float, sustain_level: float, r: float, num_samples: int, sample_rate: int):
+    adstr = torch.tensor([a,d,s_time,r])
+    adstr = torch.softmax(adstr, dim=0)
+    attack = torch.linspace(0.0,1.0, int(num_samples*adstr[0]))
+    decay = torch.linspace(1.0, sustain_level, int(num_samples*adstr[1]))
+    sustain = torch.linspace(sustain_level, sustain_level, int(num_samples*adstr[2]))
+
+    parameters = [attack, decay, sustain]
+    envelope = torch.concat(parameters, dim=0)
+    release = torch.linspace(sustain_level, 0.0, num_samples-len(envelope))
+    envelope = torch.concat([envelope, release], dim=0)
+
+    return envelope
+
+#%%
+def linear_lookup(phase: float, wavetable: torch.Tensor):
+    phase = float(phase) % 1.0
+
+    extended = torch.cat([wavetable, wavetable[:1]], dim=0)
+    table_size = wavetable.shape[0]
+
+    index = phase * table_size
+    i0 = int(math.floor(index))
+    i1 = i0 + 1
+    frac = index - i0
+
+    return extended[i0] * (1.0 - frac) + extended[i1] * frac
+
+
+#%%
+def fm_bank(base_freq: float, ratio1: float, ratio2: float, i1index2: float, i2index1: float, iout1: float, iout2: float, adsr1: torch.Tensor, adsr2: torch.Tensor, wavetable: torch.Tensor, num_samples: int, sample_rate: int):
+    ratio1 = ratio1 * 16
+    i1index2 = i1index2 * 14.5
+    i2index1 = i2index1 * 14.5
+
+    a1 = torch.zeros((num_samples))
+    a2 = torch.zeros((num_samples))
+    phase1 = 0
+    phase2 = 0
+
+    for sample in range(num_samples):
+        if sample == 0:
+            freq1 = base_freq * ratio1
+            freq2 = base_freq * ratio2
+        else:
+            freq1 = (base_freq * ratio1)*(1 + float(a2[sample-1]) * i2index1)
+            freq2 = (base_freq * ratio2)*(1 + float(a1[sample-1]) * i1index2)
+
+        if sample % 1000 == 0:
+            print(freq1, freq2)
+
+        a1[sample] = linear_lookup(phase1, wavetable)
+        a1[sample] = a1[sample] * adsr1[sample]
+
+        a2[sample] = linear_lookup(phase2, wavetable)
+        a2[sample] = a2[sample] * adsr2[sample]
+
+        phase1 = (phase1 + freq1 / float(sample_rate)) % 1.0
+        phase2 = (phase2 + freq2 / float(sample_rate)) % 1.0
+
+    aout = a1 * (iout1 / (iout1 + iout2)) + a2 * (iout2 / (iout1 + iout2))
+    return aout
+```
+Attachment Name: README.md
+Attachments Kind: Visible
+Attachments Source: RecentFilesRetriever / FileChatAttachment
+Attachments Text:
+```markdown
+# ML Midterm Project Documentation
+Ethan Bessette
+
+## Proposal
+
+### Vision
+Create a model that estimates synthesizer parameters to create patches that match target sounds.
+
+### PseudoCode
+
+![Architecture example](./Images/Figure2.png)
+
+From https://ieeexplore.ieee.org/document/10017350
+
+#### Differentiable synthesizer
+In Csound, I will design an FM synthesizer with 2 audio oscillators, 1 control oscillator, and one noise generator. They will all be able to modulate each other and themselves, like in FM8. Each will have an amplitude envelope.
+
+![FM8](./Images/Figure1.png)
+
+Even with few numbers of oscillators, a large number of sounds can be created. 
+
+https://drive.google.com/file/d/1FBpwcrP1YOWGa7a5kgqJJ4nyOe9Wz6hr/view?usp=sharing
+
+#### In-domain dataset
+All the differentiable parameters will be randomized and coupled with the synth's resulting audio output.
+This process will be automated in the terminal by generating random values to fill a csv for each differentiable synth parameter, reading the values into csound and saving the resulting audio along with the csv of parameters.
+
+#### Out of Domain dataset
+Additionally, audio that doesn't have coupled synth parameters will be used.
+
+#### Structure / Architecture
+This is an area that I have some questions and concerns about. One option is to follow the structure from the paper diagram I included above. On the other hand, I don't know enough about the various structures and optimization / training types.
+Because of this, I might use similar structure to what we've seen in class.
+
+I think if I decide on what structure to use conceptually, I would just need a generic example so I can change it to fit my needs.
+
+Ideas could include:
+Convolutional
+Multi head attention layers within transformer to find changes across time.
+
+##### Data comparisons
+I still have to learn how to use the calculated loss to optimize. I will review the nn_2 and 3 to see what optimization functions are used. For example, the loss of each individual synth parameter might be summed or averaged somehow into overall loss.
+
+For **audio spectral loss**, use MelSpectrogram. The number of bands can be adjusted, the window size, and hop length.
+
+![MelSpectrogram](./Images/Figure3.png)
+
+For **synth parameter loss**, each synth parameter will be normalized from 0 to 1 and the difference taken for each.
+
+
+#### Training
+The datasets will be divided 80-10-10 training validation testing.
+For in domain data, the loss between estimated synth parameters and real will be calculated and used to optimize.
+For all data, the audio spectral loss will be calculated by taking the difference of the MelSpectrogram of original and predicted audio and used to optimize.
+
+
+
+
+## Notepad
+Window of 4 chords, what is most likely next chord?
+Training:
+- 4 chords of song, give next chord
+
+So for audio, give a window of seconds and therefor x samples. Predict next y samples, add to output, move window
+
+Diffusion model
+Encoding: add noise to data over course of time steps until full noise.
+Train it to recognize where it is in timestep, therefore how much noise to remove to get back one tilmestep, repeat until back to original image
+It trains it to predict noise to remove per timestep until it gets an image that resembles the training images
+
+
+DDSP
+Train a model to control digital signal processing parameters to create a complex synthesizers given note pitch, velocity, and length
+- label training data with note pitch, velocity, and length
+- window of x notes of input (range of input length from 1 to maybe 4)
+
+Get output sound, match to original synthesizer, adjust sytnhezsizer parameters to reduce difference
+- gradient descent
+
+
+Calculating the loss change in output and input to gradient descent 
+- could be used for deep ANC
+
+https://realpython.com/gradient-descent-algorithm-python/
+This explains gradient descent. For a 2d vector (x,y) it finds a 1d vector, the minimum, by getting the gradient (the derivative of the 2d vector) and 
+
+
+The next chord predictor is probabilistic. It gets optimized 
+
+
+
+I could get samples of an instrument or my voice. Then
+DDSP
+Create structure of synthesizers and parameters. Randomize parameters, calculate loss, move parameters to minimize loss.
+I could calculate gradient descent of move input towards trained function
+For each audio sample, calculate difference of output to original
+
+
+One hot encoding aligns output with true correct answer in one hot encoding to determine loss.
+So for my model, it should have one output for each changeable synth parameter.
+
+
+## The Process
+
+### Dataset creation
+
+#### Csound
+I created a csound file that outputs 32 floating point wave files at each of 12 notes through the same synthesizer, naming them the index of the synth along with the note number. Outputting results in a dataset being generated that contains sets of 12 notes for each set of random synth parameters along with text files holding the synth parameters. As of now, I haven't found a way to output only the synth parameters, so the text file contains a header that will need to be discarded when cleaning data for machine learning training.
+
+There is an encode.csd file that generates parameters and creates audio for them, as well as a decode.csd that reads parameters and generates data. I tested them and it works. I also tested them on my own new parameters that I changed by hand.
+
+The next step will be figuring out how to get the .csd to run in the correct order in training. Also, training will take a long time unless I figure out how to make generating audio much faster for the amount of data I have.
+
+While the data is generating, I'm checking my activity monitor and it looks like processing is kept to 1 processor. I wonder if I could figure out multi threading to make it faster as well as forcing csound to make new instances instead of reusing them.
+
+##### Problems
+1. One problem was figuring out how to keep the pitch relatively constant during self modulation. When an oscillator self modulates its frequency, the pitch is perceived as lowering as the sidebands to the positive and negative are created. I researched ways to keep this constant and first kind Bessel functions were what came up. I tried to ask ChatGPT to help write functions to keep the pitch normal by calculating the spectral center as a function of f0 and self modulation index, but when I tried to implement it in Csound, it was too computationally expensive and sound froze every time. I spent a while finding a workaround and I ended up using a realtime polynomial function to approximate the amount of frequency offset within the range of parameters that I was using. It stops working at a certain point, but that doesn't matter since the way I programmed the synth it will never generate parameters outside that range. I also realized that a small amount of modulation by the original frequency helped to stabilize the pitch. I slightly modulate the frequency of the oscillator with a separate oscillator at its original frequency as a function of self-modulation index. While it adds some harmonics not present in true self-modulation, it doesn't matter.
+
+2. Another problem was figuring out how to keep the parameters constant while generating 12 different pitches of the same parameters. I ended up using two different scheduler instruments to do this. One scheduler spawns instances of the other scheduler so that synth sets can be generated in parallel. The other scheduler spawns 12 parallel instances of one set of parameters at different pitches. The instances themselves output the audio data, while the second scheduler holds the generated parameters and outputs them when done.
+
+3. Originally, the synth parameters were generated in each instance of a note. This obviously didn't work because what was supposed to be different pitches with the same parameters actually all had different parameters. To fix this, I generated each parameter from 0 to 1 in the 2nd scheduler instrument and set up the note instrument so that the scheduler could pass in the parameters when called. The note instrument can further process these normalized values. This allows the eventual machine learning algorithm to be able to output normalized values for the parameters which can be used to generate audio.
+
+4. It turns out Csound re-uses instances of instruments to save storage in memory. This was causing a problem where two clips were combined in one in the output audio. To solve this, I made sure to offset the parent scheduler so that it never created secondary schedulers at the same time. Note to self, I bet if I use more primary schedulers than the note length, I might have to change this so that it instantiates notes with a new identity instead of simply offsetting.
+    - Update, yes, this is the case. If I were to keep the note 5 seconds, that means I can only uses 5 instruments at a time. To generate 1000 sets of synth parameters, it would take 200 seconds to generate the dataset. Honestly that's reasonable, I'll keep it how it is for now. Nevermind 200 seconds only generates 200 examples. Def something I need to fix.
+
+5. The biggest problem is that I didn't understand that for ddsp to work, the synth has to be implemented in PyTorch.
+
+#### PyTorch
+I referenced the ddsp core.py library.
+
+I created a linear interpolation wavetable lookup function that takes in an index and returns an amplitude value based on the wavetable.
+
+I created an adsr generator that generates envelopes based on attack time, decay time, sustain time, sustain level, and release time. The time based parameters are loaded into a tensor, and softmax is applied so that the total time sums to one. Each value is then multiplied by the total number of samples to get the total time.
+
+I created an FM bank generator. Currently, it inits 2 audio tensors with zeros the length of total samples. It sets the phase of both to zero. Then, it works sample by sample:
+- calculate frequency from base frequency, ratios, previous audio tensor amplitude values, indexes
+- make the current audio sample equal the table lookup for the current phase
+- update the phase by adding its acceleration (it will always increase and wrap around 1. A higher frequency means the phase gets to 1 quicker / in larger steps. A lower frequency means it gets there in shorter steps)
+- output the audio with the values of out 1 and 2 scaled to sum to 1 to avoid clipping.
+It currently implements only modulating the other audio wave, no self modulation.
+
+
+#### DDSP
+Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters e2e differentiable.
+
+##### Original DDSP Library
+1. Preprocess raw audio
+    - detect fundamental frequency and loudness over time for 5 second clips of audio, store in a TFRecord file
+2. Save dataset stats so that future inputs can be processed to match training data
+    - pitch (f0), power, loudness, quantile transform.
+3. 
+
+
+
+##### My Implementation
+
+
+1. Break training audio into Mel spectrogram at time points, store in a data frame
+2. Save dateset stats
+3. 
+
+
+2. Given spectrogram,
+3. estimate synth parameters
+4. process audio tensor from those parameters, convert to Mel spectrogram
+5. Find loss between output and training Mel spectrogram
+6. Find loss between estimated and real synth parameters
+
+Flow of DDSP library:
+- preprocess raw audio into dataset
+    - detects 
+
+
+1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
+2. Uses those in additive to create pitched part of input
+3. Uses noise and filter to create unpatched
+4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio, 
+
+
+```
+
+
+kotlin.Unit
+
+==== UserMessageImpl #19 ====
+User: 
+# I have a labeled dataset that contains text files with synth parameters and their output audio in 32 bit float wav
+# multiple audio files share synth parameters, with only their f0 changing
+# I want to convert this dataset into something readable by a ML algorithm by analyzing the audio using melspectrogram with 128 bands, an FFT size of 1024 samples and a hop size of 256 samples (these should be hyperparameters)
+
+what's the best format for this data?
+Attachments:
+Attachment Name: README.md
+Attachments Kind: Visible
+Attachments Source: RecentFilesRetriever / FileChatAttachment
+Attachments Text:
+```markdown
+# ML Midterm Project Documentation
+Ethan Bessette
+
+## Proposal
+
+### Vision
+Create a model that estimates synthesizer parameters to create patches that match target sounds.
+
+### PseudoCode
+
+![Architecture example](./Images/Figure2.png)
+
+From https://ieeexplore.ieee.org/document/10017350
+
+#### Differentiable synthesizer
+In Csound, I will design an FM synthesizer with 2 audio oscillators, 1 control oscillator, and one noise generator. They will all be able to modulate each other and themselves, like in FM8. Each will have an amplitude envelope.
+
+![FM8](./Images/Figure1.png)
+
+Even with few numbers of oscillators, a large number of sounds can be created. 
+
+https://drive.google.com/file/d/1FBpwcrP1YOWGa7a5kgqJJ4nyOe9Wz6hr/view?usp=sharing
+
+#### In-domain dataset
+All the differentiable parameters will be randomized and coupled with the synth's resulting audio output.
+This process will be automated in the terminal by generating random values to fill a csv for each differentiable synth parameter, reading the values into csound and saving the resulting audio along with the csv of parameters.
+
+#### Out of Domain dataset
+Additionally, audio that doesn't have coupled synth parameters will be used.
+
+#### Structure / Architecture
+This is an area that I have some questions and concerns about. One option is to follow the structure from the paper diagram I included above. On the other hand, I don't know enough about the various structures and optimization / training types.
+Because of this, I might use similar structure to what we've seen in class.
+
+I think if I decide on what structure to use conceptually, I would just need a generic example so I can change it to fit my needs.
+
+Ideas could include:
+Convolutional
+Multi head attention layers within transformer to find changes across time.
+
+##### Data comparisons
+I still have to learn how to use the calculated loss to optimize. I will review the nn_2 and 3 to see what optimization functions are used. For example, the loss of each individual synth parameter might be summed or averaged somehow into overall loss.
+
+For **audio spectral loss**, use MelSpectrogram. The number of bands can be adjusted, the window size, and hop length.
+
+![MelSpectrogram](./Images/Figure3.png)
+
+For **synth parameter loss**, each synth parameter will be normalized from 0 to 1 and the difference taken for each.
+
+
+#### Training
+The datasets will be divided 80-10-10 training validation testing.
+For in domain data, the loss between estimated synth parameters and real will be calculated and used to optimize.
+For all data, the audio spectral loss will be calculated by taking the difference of the MelSpectrogram of original and predicted audio and used to optimize.
+
+
+
+
+## Notepad
+Window of 4 chords, what is most likely next chord?
+Training:
+- 4 chords of song, give next chord
+
+So for audio, give a window of seconds and therefor x samples. Predict next y samples, add to output, move window
+
+Diffusion model
+Encoding: add noise to data over course of time steps until full noise.
+Train it to recognize where it is in timestep, therefore how much noise to remove to get back one tilmestep, repeat until back to original image
+It trains it to predict noise to remove per timestep until it gets an image that resembles the training images
+
+
+DDSP
+Train a model to control digital signal processing parameters to create a complex synthesizers given note pitch, velocity, and length
+- label training data with note pitch, velocity, and length
+- window of x notes of input (range of input length from 1 to maybe 4)
+
+Get output sound, match to original synthesizer, adjust sytnhezsizer parameters to reduce difference
+- gradient descent
+
+
+Calculating the loss change in output and input to gradient descent 
+- could be used for deep ANC
+
+https://realpython.com/gradient-descent-algorithm-python/
+This explains gradient descent. For a 2d vector (x,y) it finds a 1d vector, the minimum, by getting the gradient (the derivative of the 2d vector) and 
+
+
+The next chord predictor is probabilistic. It gets optimized 
+
+
+
+I could get samples of an instrument or my voice. Then
+DDSP
+Create structure of synthesizers and parameters. Randomize parameters, calculate loss, move parameters to minimize loss.
+I could calculate gradient descent of move input towards trained function
+For each audio sample, calculate difference of output to original
+
+
+One hot encoding aligns output with true correct answer in one hot encoding to determine loss.
+So for my model, it should have one output for each changeable synth parameter.
+
+
+## The Process
+
+### Dataset creation
+
+#### Csound
+I created a csound file that outputs 32 floating point wave files at each of 12 notes through the same synthesizer, naming them the index of the synth along with the note number. Outputting results in a dataset being generated that contains sets of 12 notes for each set of random synth parameters along with text files holding the synth parameters. As of now, I haven't found a way to output only the synth parameters, so the text file contains a header that will need to be discarded when cleaning data for machine learning training.
+
+There is an encode.csd file that generates parameters and creates audio for them, as well as a decode.csd that reads parameters and generates data. I tested them and it works. I also tested them on my own new parameters that I changed by hand.
+
+The next step will be figuring out how to get the .csd to run in the correct order in training. Also, training will take a long time unless I figure out how to make generating audio much faster for the amount of data I have.
+
+While the data is generating, I'm checking my activity monitor and it looks like processing is kept to 1 processor. I wonder if I could figure out multi threading to make it faster as well as forcing csound to make new instances instead of reusing them.
+
+##### Problems
+1. One problem was figuring out how to keep the pitch relatively constant during self modulation. When an oscillator self modulates its frequency, the pitch is perceived as lowering as the sidebands to the positive and negative are created. I researched ways to keep this constant and first kind Bessel functions were what came up. I tried to ask ChatGPT to help write functions to keep the pitch normal by calculating the spectral center as a function of f0 and self modulation index, but when I tried to implement it in Csound, it was too computationally expensive and sound froze every time. I spent a while finding a workaround and I ended up using a realtime polynomial function to approximate the amount of frequency offset within the range of parameters that I was using. It stops working at a certain point, but that doesn't matter since the way I programmed the synth it will never generate parameters outside that range. I also realized that a small amount of modulation by the original frequency helped to stabilize the pitch. I slightly modulate the frequency of the oscillator with a separate oscillator at its original frequency as a function of self-modulation index. While it adds some harmonics not present in true self-modulation, it doesn't matter.
+
+2. Another problem was figuring out how to keep the parameters constant while generating 12 different pitches of the same parameters. I ended up using two different scheduler instruments to do this. One scheduler spawns instances of the other scheduler so that synth sets can be generated in parallel. The other scheduler spawns 12 parallel instances of one set of parameters at different pitches. The instances themselves output the audio data, while the second scheduler holds the generated parameters and outputs them when done.
+
+3. Originally, the synth parameters were generated in each instance of a note. This obviously didn't work because what was supposed to be different pitches with the same parameters actually all had different parameters. To fix this, I generated each parameter from 0 to 1 in the 2nd scheduler instrument and set up the note instrument so that the scheduler could pass in the parameters when called. The note instrument can further process these normalized values. This allows the eventual machine learning algorithm to be able to output normalized values for the parameters which can be used to generate audio.
+
+4. It turns out Csound re-uses instances of instruments to save storage in memory. This was causing a problem where two clips were combined in one in the output audio. To solve this, I made sure to offset the parent scheduler so that it never created secondary schedulers at the same time. Note to self, I bet if I use more primary schedulers than the note length, I might have to change this so that it instantiates notes with a new identity instead of simply offsetting.
+    - Update, yes, this is the case. If I were to keep the note 5 seconds, that means I can only uses 5 instruments at a time. To generate 1000 sets of synth parameters, it would take 200 seconds to generate the dataset. Honestly that's reasonable, I'll keep it how it is for now. Nevermind 200 seconds only generates 200 examples. Def something I need to fix.
+
+5. The biggest problem is that I didn't understand that for ddsp to work, the synth has to be implemented in PyTorch.
+
+#### PyTorch
+I referenced the ddsp core.py library.
+
+I created a linear interpolation wavetable lookup function that takes in an index and returns an amplitude value based on the wavetable.
+
+I created an adsr generator that generates envelopes based on attack time, decay time, sustain time, sustain level, and release time. The time based parameters are loaded into a tensor, and softmax is applied so that the total time sums to one. Each value is then multiplied by the total number of samples to get the total time.
+
+I created an FM bank generator. Currently, it inits 2 audio tensors with zeros the length of total samples. It sets the phase of both to zero. Then, it works sample by sample:
+- calculate frequency from base frequency, ratios, previous audio tensor amplitude values, indexes
+- make the current audio sample equal the table lookup for the current phase
+- update the phase by adding its acceleration (it will always increase and wrap around 1. A higher frequency means the phase gets to 1 quicker / in larger steps. A lower frequency means it gets there in shorter steps)
+- output the audio with the values of out 1 and 2 scaled to sum to 1 to avoid clipping.
+It currently implements only modulating the other audio wave, no self modulation.
+
+
+#### DDSP
+Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters e2e differentiable.
+
+##### Original DDSP Library
+1. Preprocess raw audio
+    - detect fundamental frequency and loudness over time for 5 second clips of audio, store in a TFRecord file
+2. Save dataset stats so that future inputs can be processed to match training data
+    - pitch (f0), power, loudness, quantile transform.
+3. 
+
+
+
+##### My Implementation
+
+
+1. Break training audio into Mel spectrogram at time points, store in a data frame
+2. Save dateset stats
+3. 
+
+
+2. Given spectrogram,
+3. estimate synth parameters
+4. process audio tensor from those parameters, convert to Mel spectrogram
+5. Find loss between output and training Mel spectrogram
+6. Find loss between estimated and real synth parameters
+
+Flow of DDSP library:
+- preprocess raw audio into dataset
+    - detects 
+
+
+1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
+2. Uses those in additive to create pitched part of input
+3. Uses noise and filter to create unpatched
+4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio, 
+
+
+```
+
+
+kotlin.Unit
+
+==== SimpleCompletableMessage #20 ====
+Assistant: 
+The best format is usually **not one giant CSV of spectrogram numbers**.
+
+For your use case, I’d recommend this:
+
+## Best practical format
+
+Use a **dataset index table + feature files**.
+
+### 1. One metadata table
+Store one row per audio example with:
+
+- `audio_path`
+- `param_path` or `param_id`
+- `midi_note` or `f0`
+- `split` (`train` / `test`)
+- optionally `num_samples`
+
+This table can be:
+
+- `.csv`
+- or better, `.parquet`
+
+Example columns:
+
+```text
+example_id,audio_path,param_id,midi_note,split
+0,Generated/0007_57.wav,7,57,train
+1,Generated/0007_60.wav,7,60,train
+2,Generated/0007_64.wav,7,64,test
+```
+
+---
+
+### 2. Store targets as a fixed 17-value vector
+For ML, your label should be a dense vector:
+
+```python
+[ p0, p1, p2, ..., p16 ]
+```
+
+not parameter names.
+
+Since many audio files share the same synth parameters, a good structure is:
+
+- one table/dict mapping `param_id -> 17-float vector`
+- many audio examples pointing to that `param_id`
+
+Example:
+
+```python
+params_by_id[7] = [0.12, 0.88, ..., 0.31]
+```
+
+This avoids duplicating labels over and over.
+
+---
+
+### 3. Precompute Mel spectrograms and save them as tensors
+Since your model input is the Mel spectrogram, the best training format is usually to preprocess audio once and save:
+
+- `.pt` files if using PyTorch
+- or `.npy` / `.npz`
+
+Each feature file contains a tensor shaped like:
+
+```python
+[n_mels, time_frames]
+```
+
+For your case:
+
+- `n_mels = 128`
+- `n_fft = 1024`
+- `hop_length = 256`
+
+So each training example becomes:
+
+```python
+x = mel_spectrogram    # shape [128, T]
+y = parameter_vector   # shape [17]
+```
+
+This is much faster than recomputing mels every epoch.
+
+---
+
+# Recommended final structure
+
+## Option A: Best simple structure for PyTorch
+
+```text
+Dataset/
+  metadata.csv
+  params.pt
+  mels/
+    000000.pt
+    000001.pt
+    000002.pt
+```
+
+Where:
+
+### `metadata.csv`
+Contains:
+
+```text
+example_id,param_id,midi_note,split,mel_path
+0,7,57,train,mels/000000.pt
+1,7,60,train,mels/000001.pt
+2,8,57,test,mels/000002.pt
+```
+
+### `params.pt`
+Could be a dictionary:
+
+```python
+{
+    7: torch.tensor([...17 values...], dtype=torch.float32),
+    8: torch.tensor([...17 values...], dtype=torch.float32),
+}
+```
+
+### `mels/000000.pt`
+Contains:
+
+```python
+torch.Tensor shape [128, T]
+```
+
+This is probably the best overall choice.
+
+---
+
+## Option B: One file per example
+If you want it even simpler, save each example as one `.pt` file:
+
+```python
+{
+    "x": mel_tensor,         # [128, T]
+    "y": param_tensor,       # [17]
+    "param_id": 7,
+    "midi_note": 57,
+}
+```
+
+Folder:
+
+```text
+Dataset/
+  train/
+    000000.pt
+    000001.pt
+  test/
+    000002.pt
+```
+
+This is very easy to load in a PyTorch `Dataset`.
+
+### Pros
+- simple
+- self-contained
+- easy training code
+
+### Cons
+- duplicates parameter vectors across notes
+
+Still, for a moderate-size dataset, this is often the easiest and best.
+
+---
+
+# What I recommend for your project
+
+I recommend:
+
+## Training format
+For each example, save:
+
+- `mel`: `float32`, shape `[128, T]`
+- `params`: `float32`, shape `[17]`
+- `f0` or `midi_note`: scalar
+
+as a `.pt` file.
+
+Example content:
+
+```python
+{
+    "mel": mel,                  # torch.float32 [128, T]
+    "params": params,            # torch.float32 [17]
+    "midi_note": midi_note,      # int
+    "f0": f0,                    # float
+}
+```
+
+This is the easiest format for your model.
+
+---
+
+# Why this is better than CSV
+
+A CSV is bad for spectrogram data because:
+
+- spectrograms are 2D tensors
+- time dimension may vary
+- loading is slow
+- parsing huge numeric text files is inefficient
+- PyTorch works better with binary tensors
+
+Use binary tensor files instead:
+- `.pt`
+- `.npy`
+- `.npz`
+
+---
+
+# Important design choice: include `f0` in the input or not?
+
+Because multiple audio files share the same parameters and only differ in fundamental frequency, you should strongly consider storing `f0`/`midi_note` with each example.
+
+Why:
+- otherwise the model must infer pitch only from the spectrogram
+- but the same synth parameters can sound different at different pitches
+- giving pitch explicitly may make parameter estimation easier
+
+So each training example should probably be:
+
+```python
+input = {
+    "mel": [128, T],
+    "f0": scalar
+}
+target = [17]
+```
+
+Even if you don’t feed `f0` to the network immediately, keep it in the dataset.
+
+---
+
+# Best split strategy
+
+Since multiple notes share the same parameter set, the split matters.
+
+## Better split
+Split by **parameter set**, not by individual audio files.
+
+So:
+- all audio derived from one synth parameter vector should go entirely into train or entirely into test
+
+This prevents leakage.
+
+Bad:
+- note 57 from param set 7 in train
+- note 60 from same param set 7 in test
+
+That would let the model partially memorize the target parameters.
+
+Good:
+- param set 7 entirely in train
+- param set 8 entirely in test
+
+---
+
+# Final recommended schema
+
+## Per example
+```python
+{
+    "mel": torch.float32,      # [128, T]
+    "params": torch.float32,   # [17]
+    "midi_note": int,
+    "f0": float,
+    "param_id": int,
+}
+```
+
+## On disk
+Either:
+
+### simple version
+```text
+Dataset/
+  train/
+    000000.pt
+    000001.pt
+  test/
+    000002.pt
+    000003.pt
+```
+
+or
+
+### scalable version
+```text
+Dataset/
+  metadata.parquet
+  mels/
+  params.pt
+```
+
+---
+
+# Short answer
+
+**Best format:** precomputed Mel spectrogram tensors saved as `.pt` or `.npy`, with a matching 17-value parameter vector label, plus `f0/midi_note` metadata.
+
+If you want the simplest implementation:
+- save one `.pt` file per example
+- each file contains `{"mel": ..., "params": ..., "midi_note": ..., "f0": ...}`
+
+That’s probably the best choice for your project.
+
+If you want, I can next write:
+1. a **preprocessing script** that reads your wav + parameter files and saves this dataset format, or  
+2. a **PyTorch Dataset class** that loads it for training.
+
+kotlin.Unit
+
+==== UserMessageImpl #21 ====
+User: 
+how to get the sizes to be the same for this to work. adsr expects a 1 dimension tensor with 6 values
+Attachments:
+Attachment Name: Console Selection
+Attachments Kind: Visible
+Attachments Source: Other / SelectionChatAttachment
+Attachments Text:
+adsr(torch.cat([parameters[7:11], parameters[17]], dim=0))
+Attachment Name: main.py
+Attachments Kind: Visible
+Attachments Source: LocalEmbeddingRetriever / RelatedCodeChatAttachmentWithFile
+Attachments Text:
+def adsr(adstsr_numSamples: torch.Tensor):
+    a,d,s_time,sustain,r,num_samples = adstsr_numSamples
+    adstr = torch.tensor([a,d,s_time,r])
+    adstr = torch.softmax(adstr, dim=0)
+    attack = torch.linspace(0.0,1.0, int(num_samples*adstr[0]))
+    decay = torch.linspace(1.0, sustain, int(num_samples*adstr[1]))
+    sustain = torch.linspace(sustain, sustain, int(num_samples*adstr[2]))
+    envelope = torch.concat([attack, decay, sustain], dim=0)
+    release = torch.linspace(sustain, 0.0, num_samples-len(envelope))
+    envelope = torch.concat([envelope, release], dim=0)
+    return envelope
+Attachment Name: README.md
+Attachments Kind: Visible
+Attachments Source: RecentFilesRetriever / FileChatAttachment
+Attachments Text:
+```markdown
+# ML Midterm Project Documentation
+Ethan Bessette
+
+## Proposal
+
+### Vision
+Create a model that estimates synthesizer parameters to create patches that match target sounds.
+
+### PseudoCode
+
+![Architecture example](./Images/Figure2.png)
+
+From https://ieeexplore.ieee.org/document/10017350
+
+#### Differentiable synthesizer
+In Csound, I will design an FM synthesizer with 2 audio oscillators, 1 control oscillator, and one noise generator. They will all be able to modulate each other and themselves, like in FM8. Each will have an amplitude envelope.
+
+![FM8](./Images/Figure1.png)
+
+Even with few numbers of oscillators, a large number of sounds can be created. 
+
+https://drive.google.com/file/d/1FBpwcrP1YOWGa7a5kgqJJ4nyOe9Wz6hr/view?usp=sharing
+
+#### In-domain dataset
+All the differentiable parameters will be randomized and coupled with the synth's resulting audio output.
+This process will be automated in the terminal by generating random values to fill a csv for each differentiable synth parameter, reading the values into csound and saving the resulting audio along with the csv of parameters.
+
+#### Out of Domain dataset
+Additionally, audio that doesn't have coupled synth parameters will be used.
+
+#### Structure / Architecture
+This is an area that I have some questions and concerns about. One option is to follow the structure from the paper diagram I included above. On the other hand, I don't know enough about the various structures and optimization / training types.
+Because of this, I might use similar structure to what we've seen in class.
+
+I think if I decide on what structure to use conceptually, I would just need a generic example so I can change it to fit my needs.
+
+Ideas could include:
+Convolutional
+Multi head attention layers within transformer to find changes across time.
+
+##### Data comparisons
+I still have to learn how to use the calculated loss to optimize. I will review the nn_2 and 3 to see what optimization functions are used. For example, the loss of each individual synth parameter might be summed or averaged somehow into overall loss.
+
+For **audio spectral loss**, use MelSpectrogram. The number of bands can be adjusted, the window size, and hop length.
+
+![MelSpectrogram](./Images/Figure3.png)
+
+For **synth parameter loss**, each synth parameter will be normalized from 0 to 1 and the difference taken for each.
+
+
+#### Training
+The datasets will be divided 80-10-10 training validation testing.
+For in domain data, the loss between estimated synth parameters and real will be calculated and used to optimize.
+For all data, the audio spectral loss will be calculated by taking the difference of the MelSpectrogram of original and predicted audio and used to optimize.
+
+
+
+
+## Notepad
+Window of 4 chords, what is most likely next chord?
+Training:
+- 4 chords of song, give next chord
+
+So for audio, give a window of seconds and therefor x samples. Predict next y samples, add to output, move window
+
+Diffusion model
+Encoding: add noise to data over course of time steps until full noise.
+Train it to recognize where it is in timestep, therefore how much noise to remove to get back one tilmestep, repeat until back to original image
+It trains it to predict noise to remove per timestep until it gets an image that resembles the training images
+
+
+DDSP
+Train a model to control digital signal processing parameters to create a complex synthesizers given note pitch, velocity, and length
+- label training data with note pitch, velocity, and length
+- window of x notes of input (range of input length from 1 to maybe 4)
+
+Get output sound, match to original synthesizer, adjust sytnhezsizer parameters to reduce difference
+- gradient descent
+
+
+Calculating the loss change in output and input to gradient descent 
+- could be used for deep ANC
+
+https://realpython.com/gradient-descent-algorithm-python/
+This explains gradient descent. For a 2d vector (x,y) it finds a 1d vector, the minimum, by getting the gradient (the derivative of the 2d vector) and 
+
+
+The next chord predictor is probabilistic. It gets optimized 
+
+
+
+I could get samples of an instrument or my voice. Then
+DDSP
+Create structure of synthesizers and parameters. Randomize parameters, calculate loss, move parameters to minimize loss.
+I could calculate gradient descent of move input towards trained function
+For each audio sample, calculate difference of output to original
+
+
+One hot encoding aligns output with true correct answer in one hot encoding to determine loss.
+So for my model, it should have one output for each changeable synth parameter.
+
+
+## The Process
+
+### Dataset creation
+
+#### Csound
+I created a csound file that outputs 32 floating point wave files at each of 12 notes through the same synthesizer, naming them the index of the synth along with the note number. Outputting results in a dataset being generated that contains sets of 12 notes for each set of random synth parameters along with text files holding the synth parameters. As of now, I haven't found a way to output only the synth parameters, so the text file contains a header that will need to be discarded when cleaning data for machine learning training.
+
+There is an encode.csd file that generates parameters and creates audio for them, as well as a decode.csd that reads parameters and generates data. I tested them and it works. I also tested them on my own new parameters that I changed by hand.
+
+The next step will be figuring out how to get the .csd to run in the correct order in training. Also, training will take a long time unless I figure out how to make generating audio much faster for the amount of data I have.
+
+While the data is generating, I'm checking my activity monitor and it looks like processing is kept to 1 processor. I wonder if I could figure out multi threading to make it faster as well as forcing csound to make new instances instead of reusing them.
+
+##### Problems
+1. One problem was figuring out how to keep the pitch relatively constant during self modulation. When an oscillator self modulates its frequency, the pitch is perceived as lowering as the sidebands to the positive and negative are created. I researched ways to keep this constant and first kind Bessel functions were what came up. I tried to ask ChatGPT to help write functions to keep the pitch normal by calculating the spectral center as a function of f0 and self modulation index, but when I tried to implement it in Csound, it was too computationally expensive and sound froze every time. I spent a while finding a workaround and I ended up using a realtime polynomial function to approximate the amount of frequency offset within the range of parameters that I was using. It stops working at a certain point, but that doesn't matter since the way I programmed the synth it will never generate parameters outside that range. I also realized that a small amount of modulation by the original frequency helped to stabilize the pitch. I slightly modulate the frequency of the oscillator with a separate oscillator at its original frequency as a function of self-modulation index. While it adds some harmonics not present in true self-modulation, it doesn't matter.
+
+2. Another problem was figuring out how to keep the parameters constant while generating 12 different pitches of the same parameters. I ended up using two different scheduler instruments to do this. One scheduler spawns instances of the other scheduler so that synth sets can be generated in parallel. The other scheduler spawns 12 parallel instances of one set of parameters at different pitches. The instances themselves output the audio data, while the second scheduler holds the generated parameters and outputs them when done.
+
+3. Originally, the synth parameters were generated in each instance of a note. This obviously didn't work because what was supposed to be different pitches with the same parameters actually all had different parameters. To fix this, I generated each parameter from 0 to 1 in the 2nd scheduler instrument and set up the note instrument so that the scheduler could pass in the parameters when called. The note instrument can further process these normalized values. This allows the eventual machine learning algorithm to be able to output normalized values for the parameters which can be used to generate audio.
+
+4. It turns out Csound re-uses instances of instruments to save storage in memory. This was causing a problem where two clips were combined in one in the output audio. To solve this, I made sure to offset the parent scheduler so that it never created secondary schedulers at the same time. Note to self, I bet if I use more primary schedulers than the note length, I might have to change this so that it instantiates notes with a new identity instead of simply offsetting.
+    - Update, yes, this is the case. If I were to keep the note 5 seconds, that means I can only uses 5 instruments at a time. To generate 1000 sets of synth parameters, it would take 200 seconds to generate the dataset. Honestly that's reasonable, I'll keep it how it is for now. Nevermind 200 seconds only generates 200 examples. Def something I need to fix.
+
+5. The biggest problem is that I didn't understand that for ddsp to work, the synth has to be implemented in PyTorch.
+
+#### PyTorch
+I referenced the ddsp core.py library.
+
+I created a linear interpolation wavetable lookup function that takes in an index and returns an amplitude value based on the wavetable.
+
+I created an adsr generator that generates envelopes based on attack time, decay time, sustain time, sustain level, and release time. The time based parameters are loaded into a tensor, and softmax is applied so that the total time sums to one. Each value is then multiplied by the total number of samples to get the total time.
+
+I created an FM bank generator. Currently, it inits 2 audio tensors with zeros the length of total samples. It sets the phase of both to zero. Then, it works sample by sample:
+- calculate frequency from base frequency, ratios, previous audio tensor amplitude values, indexes
+- make the current audio sample equal the table lookup for the current phase
+- update the phase by adding its acceleration (it will always increase and wrap around 1. A higher frequency means the phase gets to 1 quicker / in larger steps. A lower frequency means it gets there in shorter steps)
+- output the audio with the values of out 1 and 2 scaled to sum to 1 to avoid clipping.
+It currently implements only modulating the other audio wave, no self modulation.
+
+Next step: generate dataset
+
+# the dataset will be split 80:20, 80% training, 20% testing
+# batch and epoch processing (batch and epoch are hyperparameters)
+# for training:
+# spectrogram frames will enter 3 layers of 1d convolution network with batch normalization after each layer
+# the output will enter a GRU layer with 1024 units (a hyperparameter)
+# finally, the output will enter a linear layer with 17 outputs (one for each synth parameter)
+# the values of each synth parameter will be used to generate resulting audio:
+
+
+
+#### DDSP
+Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters e2e differentiable.
+
+##### Original DDSP Library
+1. Preprocess raw audio
+    - detect fundamental frequency and loudness over time for 5 second clips of audio, store in a TFRecord file
+2. Save dataset stats so that future inputs can be processed to match training data
+    - pitch (f0), power, loudness, quantile transform.
+3. 
+
+
+
+##### My Implementation
+
+
+1. Break training audio into Mel spectrogram at time points, store in a data frame
+2. Save dateset stats
+3. 
+
+
+2. Given spectrogram,
+3. estimate synth parameters
+4. process audio tensor from those parameters, convert to Mel spectrogram
+5. Find loss between output and training Mel spectrogram
+6. Find loss between estimated and real synth parameters
+
+Flow of DDSP library:
+- preprocess raw audio into dataset
+    - detects 
+
+
+1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
+2. Uses those in additive to create pitched part of input
+3. Uses noise and filter to create unpatched
+4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio, 
+
+
+```
+
+
+kotlin.Unit
+
+==== SimpleCompletableMessage #22 ====
+Assistant: 
+`torch.cat()` can only concatenate tensors that have the same number of dimensions.
+
+Your problem is likely:
+
+- `parameters[7:11]` is a **1D tensor** of shape `[4]`
+- `parameters[17]` is a **0D scalar tensor** of shape `[]`
+
+So this fails:
+
+```python
+torch.cat([parameters[7:11], parameters[17]], dim=0)
+```
+
+because `[4]` and `[]` do not match.
+
+## Fix
+
+Wrap the scalar in a 1D tensor with one element:
+
+```python
+torch.cat([parameters[7:11], parameters[17].unsqueeze(0)], dim=0)
+```
+
+That gives:
+
+- `parameters[7:11]` -> shape `[4]`
+- `parameters[17].unsqueeze(0)` -> shape `[1]`
+
+so result shape becomes `[5]`.
+
+---
+
+## But your `adsr()` expects 6 values
+
+You said `adsr` expects:
+
+```python
+a, d, s_time, sustain, r, num_samples
+```
+
+That means you need **6 total values**, not 5.
+
+So you probably want something like:
+
+```python
+torch.cat([parameters[7:12], parameters[17].unsqueeze(0)], dim=0)
+```
+
+because:
+
+- `parameters[7:12]` gives 5 values:
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+- plus `parameters[17]` gives the 6th value
+
+Total = 6 values.
+
+```python
+adsr(torch.cat([parameters[7:12], parameters[17].unsqueeze(0)], dim=0))
+```
+
+---
+
+## Important indexing note
+
+Python slices exclude the end index:
+
+- `parameters[7:11]` means indices `7, 8, 9, 10`
+- `parameters[7:12]` means indices `7, 8, 9, 10, 11`
+
+So if you need attack, decay, sustain time, sustain level, release, you want `7:12`, not `7:11`.
+
+---
+
+## Cleaner version
+
+You could also write:
+
+```python
+adsr_params = torch.cat((parameters[7:12], parameters[17].view(1)))
+env = adsr(adsr_params)
+```
+
+or:
+
+```python
+adsr_params = torch.tensor([
+    parameters[7],
+    parameters[8],
+    parameters[9],
+    parameters[10],
+    parameters[11],
+    parameters[17],
+])
+```
+
+But `cat(...view(1))` is cleaner if `parameters` is already a tensor.
+
+---
+
+## Best answer
+
+Use:
+
+```python
+adsr(torch.cat([parameters[7:12], parameters[17].unsqueeze(0)], dim=0))
+```
+
+If you want, I can also help fix the `adsr()` function itself, because there is a naming bug in it: `sustain` is used before being reassigned.
+
+kotlin.Unit
+
