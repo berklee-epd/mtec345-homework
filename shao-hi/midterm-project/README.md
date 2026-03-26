@@ -155,7 +155,7 @@ Compared to a non-ML approach — just playing samples directly — this system 
 | Batch size | 32 |
 | Val every | 200 epochs |
 | Export format | TorchScript `.ts` (streaming mode) |
-| Deployment | Max/MSP |
+| Deployment | Max/MSP  |
 ---
 
 ## References
