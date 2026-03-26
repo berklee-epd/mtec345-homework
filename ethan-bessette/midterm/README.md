@@ -288,7 +288,8 @@ What you did (the artifact you produced and/or what you built)
 - created training outline and model, but ran into issue with synth not being fully differentiable due to sample by sample calculations from cross modulation.
 
 How machine learning is involved (e.g. model, data, tools, or concepts you used)
-- The end goal is a machine learning model that will predict the synth parameters needed to m
+- The end goal is a machine learning model that will predict the synth parameters needed to match an input sound using the synthesizer
+- This requires the output of the synth to be differentiable so that the gradient can be calculated. The current implementation is not because it modifies tensors in place, breaking the gradient
 
 What you learned or what new skill or understanding you developed
 - I learned about autogrid functions
