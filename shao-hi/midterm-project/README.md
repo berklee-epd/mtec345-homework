@@ -148,18 +148,14 @@ Compared to a non-ML approach — just playing samples directly — this system 
 | Component | Detail |
 |---|---|
 | Model | RAVE v2 + Wasserstein regularization |
-| Dataset | Personal drum one-shots + TR-808 samples |
-| Training examples | 474 chunks (~24 min audio) |
+| Dataset | Personal one-shots + drum machine |
+| Training examples | 474 chunks  |
 | Training duration | ~9,000+ epochs |
-| GPU | A100 (Google Colab Pro) |
+| GPU | A100 (Colab) |
 | Batch size | 32 |
 | Val every | 200 epochs |
 | Export format | TorchScript `.ts` (streaming mode) |
-| Deployment | Max/MSP via nn~ external |
-| Latent dimensions | 16 |
-| Sample rate | 44.1kHz mono |
-| Normalization | -23 LUFS |
-
+| Deployment | Max/MSP |
 ---
 
 ## References
