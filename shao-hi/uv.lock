@@ -6,6 +6,12 @@ resolution-markers = [
     "python_full_version < '3.14'",
 ]
 
+[manifest]
+members = [
+    "lab-5",
+    "shao-hi",
+]
+
 [[package]]
 name = "anyio"
 version = "4.12.1"
@@ -871,6 +877,21 @@ wheels = [
 ]
 
 [[package]]
+name = "lab-5"
+version = "0.1.0"
+source = { virtual = "lab-5" }
+dependencies = [
+    { name = "numpy" },
+    { name = "symusic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "numpy", specifier = ">=2.4.1" },
+    { name = "symusic", specifier = ">=0.5.9" },
+]
+
+[[package]]
 name = "lark"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1494,6 +1515,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pysmartdl"
+version = "1.3.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5a/4c/ed073b2373f115094a4a612431abe25b58e542bebd951557dcc881999ef9/pySmartDL-1.3.4.tar.gz", hash = "sha256:35275d1694f3474d33bdca93b27d3608265ffd42f5aeb28e56f38b906c0c35f4", size = 21467, upload-time = "2020-09-19T15:40:22.676Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ac/6a/582286ea74c54363cba30413214767904f0a239e12253c3817feaf78453f/pySmartDL-1.3.4-py3-none-any.whl", hash = "sha256:671c277ca710fb9b6603b19176f5c091041ec4ef6dcdb507c9a983a89ca35d31", size = 20000, upload-time = "2020-09-19T15:40:21.264Z" },
+]
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 source = { registry = "https://pypi.org/simple" }
@@ -1816,6 +1846,37 @@ wheels = [
 ]
 
 [[package]]
+name = "symusic"
+version = "0.5.9"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "platformdirs" },
+    { name = "pysmartdl" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d6/8a/4a6c53f940440bc5d60d4f2d87f07a194a3dd37121f18d506062865df558/symusic-0.5.9.tar.gz", hash = "sha256:7f6f241c6941203c177d6daaee8611ecde720ec036c448cbafa3ad4d97df58a5", size = 14888724, upload-time = "2025-11-18T04:00:54.287Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/be/67/2527abc3ee49331a8f59e8731aed817acac8d49c1550ea178e8aac215bd7/symusic-0.5.9-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:67de52f2a2f37204bab563b3abc68fa6b3ae31e5a407cacf6deb506dfe90d4c9", size = 2674861, upload-time = "2025-11-18T03:59:42.561Z" },
+    { url = "https://files.pythonhosted.org/packages/41/53/e94d8b33dc5af8225e3c0440aa15f3ae00675c63c5699fdf99491bcb72aa/symusic-0.5.9-cp313-cp313-macosx_11_0_x86_64.whl", hash = "sha256:f5faea3e8dce0bd39bb3161b9b4148708394de7f068d6df7bba2eea2b94df404", size = 2772726, upload-time = "2025-11-18T03:59:44.491Z" },
+    { url = "https://files.pythonhosted.org/packages/43/74/69dbbdb216f1f2ec3473552736aa8ddcfef165213dc5bf812add9f2f98e6/symusic-0.5.9-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:c39144edfd447ecaabea18897e5f517b5e0aa9a7907fbb278bdf79d16c5cb7e4", size = 2452644, upload-time = "2025-11-18T03:59:46.424Z" },
+    { url = "https://files.pythonhosted.org/packages/1d/41/1d97c938766691d28f85998ad57a0fc251cd400cbf08aad1ae11f71b2308/symusic-0.5.9-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:4673f55e4f6d776b545ee621a18cd77c15aa325b81d3e3dc333c552a84888341", size = 2499015, upload-time = "2025-11-18T03:59:48.282Z" },
+    { url = "https://files.pythonhosted.org/packages/44/40/124f05d5c2fe4f8f95ffa944d9b1ed5de1539a86c4afb056c4390aa37e85/symusic-0.5.9-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:0e019e2b1acda8f750fb8ad0c366be99d9b21853819461ba63e652346e939287", size = 2992440, upload-time = "2025-11-18T03:59:50.271Z" },
+    { url = "https://files.pythonhosted.org/packages/30/26/b1ff7aec292ed0def96cc8b79e8d414ee9e278803820b9503b7ce5f8c83e/symusic-0.5.9-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:a564fe499158269f43a81f7caa85509a3350d1a592e21d7e15a6a41c8bd1b31b", size = 3000597, upload-time = "2025-11-18T03:59:52.627Z" },
+    { url = "https://files.pythonhosted.org/packages/16/2e/6e5e112eaf90605f36eadadf888f6a1abc62d1edb863ea1aca0e75434577/symusic-0.5.9-cp313-cp313-win32.whl", hash = "sha256:e527c950fb3373a758f2f6e296fdfe5e94af47ac86312b2d9b11ac23b0a5c38f", size = 2036647, upload-time = "2025-11-18T03:59:54.413Z" },
+    { url = "https://files.pythonhosted.org/packages/c5/b4/ce0ad6e2e9c6617c321796d7ca512707fd38e3bb4d58c0520ea866d90f81/symusic-0.5.9-cp313-cp313-win_amd64.whl", hash = "sha256:fdf6ce723276653beb59c53e374e379b766175997423a2ceb5e0986097a44057", size = 2112138, upload-time = "2025-11-18T03:59:56.003Z" },
+    { url = "https://files.pythonhosted.org/packages/a3/d8/ac18a1015df3c48ec049c0508b8069b612b4c5aaf58786d0d9b29f3be64e/symusic-0.5.9-cp313-cp313-win_arm64.whl", hash = "sha256:36daf9dfb9a30c538a13f3b2677765820d89bd7ea678912de89b0bf3db4be1df", size = 2105918, upload-time = "2025-11-18T03:59:57.54Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/96/a37440659b069acb11b626612c3b75f5751b01cbd41835edbb80567532f4/symusic-0.5.9-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:cb2673882fe672e5da75617e383fa287329ae1aad5e75edee736f55c11776990", size = 2680057, upload-time = "2025-11-18T03:59:59.389Z" },
+    { url = "https://files.pythonhosted.org/packages/cc/29/50c1a03050dfc5ca56f10317302df229dab0bb9f8de92ade92ec2fb09ef6/symusic-0.5.9-cp314-cp314-macosx_11_0_x86_64.whl", hash = "sha256:9e60fd0eb5fe114881ab547ddd164f075e596f9991b184fb75ff877a1971c4b6", size = 2774187, upload-time = "2025-11-18T04:00:02.567Z" },
+    { url = "https://files.pythonhosted.org/packages/3c/d4/fbdabe9c43cf6ff759795758e3ce8101b5fbbecca63c747df03826ce8621/symusic-0.5.9-cp314-cp314-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:d76beec46b306f4270c67e60c49788258e58abccce7bf7841573f060820bc7a8", size = 2453330, upload-time = "2025-11-18T04:00:04.403Z" },
+    { url = "https://files.pythonhosted.org/packages/02/09/742b340c372b204f1e464e811cd3beddd233c5972c31b52fb85d599f3953/symusic-0.5.9-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:bb4b8203d0c914c7be8490d61e87cc94bb6153cc827d7ea2c58993c55fd24c3a", size = 2499244, upload-time = "2025-11-18T04:00:06.128Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/ee/ab02f95b8f0756f119a399b42c0bcaa84d77281e7565cd776379a2ba514d/symusic-0.5.9-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:3dbf712a0609c921da047f11c2adfd258a9b53757d5145ef0be0f8b30bed8e97", size = 2993275, upload-time = "2025-11-18T04:00:07.922Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/77/f2cb456264299b21dbf6565f209ab8f09b50a38d08e32f4f511dc18b9cf2/symusic-0.5.9-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:961fe1fa0c84baf19ebed171f898f5fb354ea65466dee9510b0899ae28093119", size = 3001299, upload-time = "2025-11-18T04:00:10.082Z" },
+    { url = "https://files.pythonhosted.org/packages/94/29/0133718898c1c1fba5c24b9368f03fe493fa585788948fd6442714f95ac4/symusic-0.5.9-cp314-cp314-win32.whl", hash = "sha256:137d7f8543fd335275c7b308f9347a7e4e72e11793418b49a4972c1188b99b54", size = 2054127, upload-time = "2025-11-18T04:00:11.756Z" },
+    { url = "https://files.pythonhosted.org/packages/33/a1/a79a86ec258ada16dafea21caf0b61d6b445608e2bfc43cf965347e5c957/symusic-0.5.9-cp314-cp314-win_amd64.whl", hash = "sha256:e15a8d3434de155257be73a347cd9ca8f000caa1962d2560290d9a024a1d5bf5", size = 2137554, upload-time = "2025-11-18T04:00:13.434Z" },
+    { url = "https://files.pythonhosted.org/packages/fd/c4/a806a337db9eeb5f599779dc02f09ce4b92039678fad66d63ed0047cf996/symusic-0.5.9-cp314-cp314-win_arm64.whl", hash = "sha256:e16cbcf749c978634d71426af2357f5fde841beeb2eb6471d3afdb4c0ec9577f", size = 2132862, upload-time = "2025-11-18T04:00:15.074Z" },
+]
+
+[[package]]
 name = "terminado"
 version = "0.18.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1872,6 +1933,11 @@ dependencies = [
     { name = "typing-extensions" },
 ]
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/ec/23/2c9fe0c9c27f7f6cb865abcea8a4568f29f00acaeadfc6a37f6801f84cb4/torch-2.10.0-2-cp313-none-macosx_11_0_arm64.whl", hash = "sha256:e521c9f030a3774ed770a9c011751fb47c4d12029a3d6522116e48431f2ff89e", size = 79498254, upload-time = "2026-02-10T21:44:44.095Z" },
+    { url = "https://files.pythonhosted.org/packages/ab/c6/4dfe238342ffdcec5aef1c96c457548762d33c40b45a1ab7033bb26d2ff2/torch-2.10.0-3-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:80b1b5bfe38eb0e9f5ff09f206dcac0a87aadd084230d4a36eea5ec5232c115b", size = 915627275, upload-time = "2026-03-11T14:16:11.325Z" },
+    { url = "https://files.pythonhosted.org/packages/d8/f0/72bf18847f58f877a6a8acf60614b14935e2f156d942483af1ffc081aea0/torch-2.10.0-3-cp313-cp313t-manylinux_2_28_x86_64.whl", hash = "sha256:46b3574d93a2a8134b3f5475cfb98e2eb46771794c57015f6ad1fb795ec25e49", size = 915523474, upload-time = "2026-03-11T14:17:44.422Z" },
+    { url = "https://files.pythonhosted.org/packages/f4/39/590742415c3030551944edc2ddc273ea1fdfe8ffb2780992e824f1ebee98/torch-2.10.0-3-cp314-cp314-manylinux_2_28_x86_64.whl", hash = "sha256:b1d5e2aba4eb7f8e87fbe04f86442887f9167a35f092afe4c237dfcaaef6e328", size = 915632474, upload-time = "2026-03-11T14:15:13.666Z" },
+    { url = "https://files.pythonhosted.org/packages/b6/8e/34949484f764dde5b222b7fe3fede43e4a6f0da9d7f8c370bb617d629ee2/torch-2.10.0-3-cp314-cp314t-manylinux_2_28_x86_64.whl", hash = "sha256:0228d20b06701c05a8f978357f657817a4a63984b0c90745def81c18aedfa591", size = 915523882, upload-time = "2026-03-11T14:14:46.311Z" },
     { url = "https://files.pythonhosted.org/packages/c9/6f/f2e91e34e3fcba2e3fc8d8f74e7d6c22e74e480bbd1db7bc8900fdf3e95c/torch-2.10.0-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:5c4d217b14741e40776dd7074d9006fd28b8a97ef5654db959d8635b2fe5f29b", size = 146004247, upload-time = "2026-01-21T16:24:29.335Z" },
     { url = "https://files.pythonhosted.org/packages/98/fb/5160261aeb5e1ee12ee95fe599d0541f7c976c3701d607d8fc29e623229f/torch-2.10.0-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:6b71486353fce0f9714ca0c9ef1c850a2ae766b409808acd58e9678a3edb7738", size = 915716445, upload-time = "2026-01-21T16:22:45.353Z" },
     { url = "https://files.pythonhosted.org/packages/6a/16/502fb1b41e6d868e8deb5b0e3ae926bbb36dab8ceb0d1b769b266ad7b0c3/torch-2.10.0-cp313-cp313-win_amd64.whl", hash = "sha256:c2ee399c644dc92ef7bc0d4f7e74b5360c37cdbe7c5ba11318dda49ffac2bc57", size = 113757050, upload-time = "2026-01-21T16:24:19.204Z" },
