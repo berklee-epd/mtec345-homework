@@ -3,6 +3,7 @@ AI Tools Review
 Ethan Bessette
 
 ## The Process
+I used the Stability AI open audio model.
 
 ### Setup
 1. In the root directory:
@@ -244,3 +245,8 @@ I adjusted some automation and tried my best to mix some things quickly, then us
 
 
 Link to assets: [google drive](https://drive.google.com/drive/folders/1KlYOBlIUVHPDTamFagIMJ9nHqfbBUdxR?usp=sharing)
+
+
+## Reflection
+
+I think this is a workflow that I would like to spend more time with. It reminds me of a project form the Csound class when we had to export a number of sounds, either from custom made patches, or from patches we found online or in the documentation. Then we used them to create sample instruments that we turned into a musical piece. I think that while Suno focuses on full tracks, it would be nice if this resource become more accurate to the prompt so that shorter clips can be generated easily. I enjoy putting together sounds from collections of samples, whether they're recorded by me, created from audio code I wrote, or generated with machine learning. However, from my bit of experimentation this week with Stability AI open, it doesn't match the quality of Suno.
