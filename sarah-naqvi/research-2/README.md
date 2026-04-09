@@ -31,16 +31,10 @@ Next, I also wanted to try the Voice Changer capabilities and record directly in
 To finish the composition I selected the guitar audio, violin, "Ashanti" speech, and some kick samples from the generated percussion track. I exported these tracks to Ableton Live 12 in order to process them with reverb and chop the audio files so I could control the arrangement better. I used SpaceBlender Reverb and Ableton stock plugins for the compressor and limiter. I also used Ableton to pitch shift the audio files and warp them in various ways. 
 
 ### Pre-Processed Composition (only Moises)
-<audio controls>
-  <source src="Pre-Processed Composition.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
+Refer to Pre-Processed Composition.mp3
 
 ### Post-Processed Composition (Moises + Ableton)
-<audio controls>
-  <source src="Bethany.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
+Refer to Bethany.mp3
 
 ## Strengths 
 Moises has a very attractive interface that looks very clean and easy to use, especially for someone who has never tried music production before. It is not overwhelming and seems very approachable. The free version of Moises AI Studio is most effective at stem splitting and identifying the key, tempo, chords, and lyrics of songs. It is also great to generate very quick stems for common western pop music instruments such as keys, drum, and bass. I also feel that it does a great job with the voice changers, as it offers a whole library of different voices to choose from with different ranges and timbres. I also liked that this was available for the free version. The mastering tool also seemed to produce a pretty decent master of the unmastered composition that I had exported from Ableton; however, unfortunately the mastered output could not be exported with the free version so it was practicially unusable. If you did pay for the pro version, Moises offers many options to export masters as high quality audio files at different loudness levels suitable for different streaming platforms. I also appreciated that Moises would accept many different file options for audio input, including video files. This is useful to me because I was able to insert my screen recording of the speech from Hasan Minhaj's comedy set. 
