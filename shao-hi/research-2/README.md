@@ -21,7 +21,7 @@ Used Magenta Studio's plugins to generate randomized MIDI melodies and drum patt
 
 ### 2. Audio Generation (RAVE + vschaos2 in Max/MSP)
 
-Ran my **custom-trained RAVE model** (trained on my own dataset) alongside **vschaos2** inside Max/MSP. Explored the latent space for a while until I found usable samples and textures. Applied additional processing to shape the results.
+Ran my **custom-trained RAVE model** (trained on my own dataset) alongside **vschaos2** (pretrained folder https://www.dropbox.com/scl/fo/6th53cqxmpf106jj84usk/AFd9AYaZ3fuYBsGHtzPgWAg?rlkey=auvetbzxc89kv1uzvl7u3kc4n&e=1&dl=0)inside Max/MSP. Explored  for a while until I found  samples and textures. Applied additional processing to shape the results.
 
 ### 3. Assembly (Ableton Live)
 
