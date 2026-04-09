@@ -16,16 +16,16 @@ def main():
 
     # Set up text and timing conditioning
     conditioning = [{
-        "prompt": "160 bpm breakbeat with metal pipe fall on cement, loud distorted clang with low pitch resonance, salt shaker hihat",
-        "negative_prompt": "low quality",
+        "prompt": "mandolin pluck ambient jazz texture",
+        "negative_prompt": "",
         "seconds_start": 0,
-        "seconds_total": 30
+        "seconds_total": 47,
     }]
 
     # Generate stereo audio
     output = generate_diffusion_cond(
         model,
-        steps=100,
+        steps=200,
         cfg_scale=7,
         conditioning=conditioning,
         sample_size=sample_size,
@@ -40,7 +40,7 @@ def main():
 
     # Peak normalize, clip, convert to int16, and save to file
     output = output.to(torch.float32).div(torch.max(torch.abs(output))).clamp(-1, 1).mul(32767).to(torch.int16).cpu()
-    with wave.open("output.wav", "wb") as f:
+    with wave.open("MX_pluck.wav", "wb") as f:
         f.setnchannels(2)
         f.setsampwidth(2)
         f.setframerate(sample_rate)
