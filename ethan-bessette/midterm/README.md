@@ -139,40 +139,163 @@ I created an FM bank generator. Currently, it inits 2 audio tensors with zeros t
 - output the audio with the values of out 1 and 2 scaled to sum to 1 to avoid clipping.
 It currently implements only modulating the other audio wave, no self modulation.
 
+Next step: generate dataset
+
+I used ChatGPT for:
+- create functions for making Mel spectrograms for pre-processing
+- helper functions for converting between midi, frequency, and Mels
+- manage multiple cpus to speed up dataset creation
+- suggesting how to edit the synthesize function for batch processing
+- suggesting how to save a single .pt with all the parameter sets (since 12 notes all share parameters)
+- for each example, save .pt files containing the Mels, id of the parameters from the above file, and the fundamental frequency (in case I end up separating. For now I don't need this)
+- assign parameter sets to train or test sets
+- compute stats about training data for normalizing test data and save to a file
+- save a csv containing the file path of each example, its parameter id, midi note, f0, and whether its train or test data (all notes sharing parameters were assigned to the same split to avoid data leaks)
+
+Summary of AI use: I knew I wanted to process the data before saving to disk to decrease file size (instead of saving wave files and then processing them). I didn't know which functions to use for Mel processing, but I knew the arguments I wanted to use for them and I understand what they do. I didn't know how to assign tasks to different CPUs, but I knew I wanted each CPU to work on all the notes for a parameter set at once. I didn't know how to adjsut my synthesis code to allow for the additional tensor dimension. However, after receiving help I understand why the changes to synthesize() were made.
 
 #### DDSP
-Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters e2e differentiable.
+Includes tensor operations that create audio synthesis as part of the machine learning function. This makes the parameters end to end differentiable.
 
 ##### Original DDSP Library
 1. Preprocess raw audio
     - detect fundamental frequency and loudness over time for 5 second clips of audio, store in a TFRecord file
 2. Save dataset stats so that future inputs can be processed to match training data
     - pitch (f0), power, loudness, quantile transform.
-3. 
 
+Training:
+1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
+2. Uses those in additive to create pitched part of input
+3. Uses noise and filter to create unpitched
+4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio
 
 
 ##### My Implementation
 
 
-1. Break training audio into Mel spectrogram at time points, store in a data frame
-2. Save dateset stats
-3. 
-
-
-2. Given spectrogram,
-3. estimate synth parameters
+1. Break training audio into Mel spectrogram at time points, save paired with parameters. Break into training and test data.
+2. Save dateset stats for normalizing test data.
+Training:
+3. estimate synth parameters for given Mels
 4. process audio tensor from those parameters, convert to Mel spectrogram
 5. Find loss between output and training Mel spectrogram
 6. Find loss between estimated and real synth parameters
+7. autograd
+8. Repeat
 
-Flow of DDSP library:
-- preprocess raw audio into dataset
-    - detects 
+### Training
 
+Understanding conv2d layers:
+https://colab.research.google.com/github/d2l-ai/d2l-en-colab/blob/master/chapter_convolutional-neural-networks/padding-and-strides.ipynb
 
-1. expects Nn to output amplitude over time, harmonics over time, and fundamental f over times
-2. Uses those in additive to create pitched part of input
-3. Uses noise and filter to create unpatched
-4. The output of the model = input of synth closely reflects the spectral and envelope data of the original audio, 
+- kernel size is the size of the filer that moves up/down left/right over the 'image'
+    - if the input is not square, consider using a rectangular kernel as well
+    - so in my case, I have input that's (128, T) where T is 750
+    - consider a kernel that is (7, 41)
+        - this is based on the ration 7 / 128 used here: https://ieeexplore.ieee.org/document/10017350
+        - maybe start with something larger to make sure it works. (47, 281)
+- padding is the number of rows and columns added to the input so that the kernel captures the data in the corners and edges better
+- stride is like window size, how many units the window moves up and sideways
+    - to preserve size, use P = ((S-1)*W-S+F)/2, with F = filter size, S = stride, W = input size
+    - if using a stride of (2, 12), a kernel of (48,282), input is (128, 750), padding = (87, 4260)
+
+#### Pseudocode
+Handle loading data using DataLoader and set the batch size with BATCH_SIZE and shuffle=true
+
+Suggest a batch size? 64
+
+1. mel frames in to nn.conv2
+    - input channels is 1 because mono audio
+    - height is num Mels, 128
+    - width is timesteps = 750
+    - so input is (128,750)
+    - stride=(2,12) kernel=(48,282) padding=(87,4260)
+2. Batch normalization
+3. Repeat 1 and 2 three times
+4. Send to GRU
+    - batch_first=true
+    - input will be (batch#, 750, 128)
+        - batch, sequence, features
+    - input_size=features=128
+    - hidden_size=256
+        - maybe 512 if needed
+5. Send to linear layer
+6. Use output to synthesize audio
+7. Calculate mel
+8. Get loss between Mels and L1 loss between parameters
+    - first 0.125 epochs, only use L1 loss
+    - for the next 0.375 epochs, mix loss linearly between parameter and spectral loss
+    - for the last 0.5 opochs, use an even mix of parameter and spectral loss
+    - multiply the L1 loss so it equal the spectral loss
+9. Adam optimizer
+    - start learning rate at 0.005, decrease exponentially by 0.99
+        - learning_rate = 0.005 * (0.99)^epoch
+
+#### Issues
+/Users/ethan/.local/bin/uv run /Users/ethan/Int Working Media Drive/Berklee/Semester 8/MTEC345 Machine Learning/mtec345-homework/ethan-bessette/midterm/.venv/bin/python /Users/ethan/Int Working Media Drive/Berklee/Semester 8/MTEC345 Machine Learning/mtec345-homework/ethan-bessette/midterm/train.py 
+/Users/ethan/Int Working Media Drive/Berklee/Semester 8/MTEC345 Machine Learning/mtec345-homework/ethan-bessette/midterm/.venv/lib/python3.13/site-packages/torch/autograd/graph.py:829: UserWarning: Error detected in MulBackward0. Traceback of forward call that caused the error:
+  File "/Users/ethan/Int Working Media Drive/Berklee/Semester 8/MTEC345 Machine Learning/mtec345-homework/ethan-bessette/midterm/train.py", line 309, in <module>
+    train()
+  File "/Users/ethan/Int Working Media Drive/Berklee/Semester 8/MTEC345 Machine Learning/mtec345-homework/ethan-bessette/midterm/train.py", line 264, in train
+    pred_mels = render_predicted_mels(pred_params, f0s).to(DEVICE)
+  File "/Users/ethan/Int Working Media Drive/Berklee/Semester 8/MTEC345 Machine Learning/mtec345-homework/ethan-bessette/midterm/train.py", line 192, in render_predicted_mels
+    audio = synth.synthesize_a_batch(pred_params, adsr1, adsr2, f0s)
+  File "/Users/ethan/Int Working Media Drive/Berklee/Semester 8/MTEC345 Machine Learning/mtec345-homework/ethan-bessette/midterm/synth.py", line 220, in synthesize_a_batch
+    freq2 = f0s * (1 + a1[:, sample - 1] * i1index2)
+ (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/torch/csrc/autograd/python_anomaly_mode.cpp:127.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+Traceback (most recent call last):
+  File "/Users/ethan/Int Working Media Drive/Berklee/Semester 8/MTEC345 Machine Learning/mtec345-homework/ethan-bessette/midterm/train.py", line 309, in <module>
+    train()
+    ~~~~~^^
+  File "/Users/ethan/Int Working Media Drive/Berklee/Semester 8/MTEC345 Machine Learning/mtec345-homework/ethan-bessette/midterm/train.py", line 275, in train
+    total_loss.backward()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/ethan/Int Working Media Drive/Berklee/Semester 8/MTEC345 Machine Learning/mtec345-homework/ethan-bessette/midterm/.venv/lib/python3.13/site-packages/torch/_tensor.py", line 647, in backward
+    torch.autograd.backward(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        self, gradient, retain_graph, create_graph, inputs=inputs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/ethan/Int Working Media Drive/Berklee/Semester 8/MTEC345 Machine Learning/mtec345-homework/ethan-bessette/midterm/.venv/lib/python3.13/site-packages/torch/autograd/__init__.py", line 354, in backward
+    _engine_run_backward(
+    ~~~~~~~~~~~~~~~~~~~~^
+        tensors,
+        ^^^^^^^^
+    ...<5 lines>...
+        accumulate_grad=True,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/ethan/Int Working Media Drive/Berklee/Semester 8/MTEC345 Machine Learning/mtec345-homework/ethan-bessette/midterm/.venv/lib/python3.13/site-packages/torch/autograd/graph.py", line 829, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        t_outputs, *args, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )  # Calls into the C++ engine to run the backward pass
+    ^
+RuntimeError: one of the variables needed for gradient computation has been modified by an inplace operation: [torch.FloatTensor [64]], which is output 0 of AsStridedBackward0, is at version 191998; expected version 191996 instead. Hint: the backtrace further above shows the operation that failed to compute its gradient. The variable in question was changed in there or anywhere later. Good luck!
+
+Process finished with exit code 1
+
+## Midterm Reflection
+
+What you did (the artifact you produced and/or what you built)
+- programmed a FM synth
+- re-programmed the synth using Pytorch
+    - more details above
+- created training outline and model, but ran into issue with synth not being fully differentiable due to sample by sample calculations from cross modulation.
+
+How machine learning is involved (e.g. model, data, tools, or concepts you used)
+- The end goal is a machine learning model that will predict the synth parameters needed to match an input sound using the synthesizer
+- This requires the output of the synth to be differentiable so that the gradient can be calculated. The current implementation is not because it modifies tensors in place, breaking the gradient
+
+What you learned or what new skill or understanding you developed
+- I learned about autogrid functions
+- I became more familiar with PyTorch by programming the synth in it
+
+Reflection: challenges, what you would do differently, and how the results compare to your expectations (or to a non-ML approach, if relevant)
+- I got the model to work and output untrained data, but the synth was not fully differentiable due to sample by sample calculations from cross modulation.
+- In the future I want to figure out how to get this part to be differentiable so I can train the model
 
