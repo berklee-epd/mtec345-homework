@@ -1,0 +1,16 @@
+# Lab 5: Symbolic Music Generation 
+## Image to Audio Algorithm & How it Works
+
+I designed an algorithm which intakes an image and produces a MIDI file. When given an image, the algorithm will pull data from each individual row of pixels to produce a unique MIDI sequence. This is done in 4 different voices to create a "chorale" style composition.
+
+It begins with the Pillow library for Python, which deals with image processing and converting images into NumPy data. The algorithm begins by processing the image to put it into a format which will work better for the algorithm. The resolution of the image is reduced for the sake of creating an interesting composition and it is converted to grayscale because it only uses the brightness of each pixel and not the hue. From there the data for each pixel is parsed so that it can be used by the Symusic library. 
+
+With the processed image, Symusic (with help of NumPy) can begin building a MIDI file based on it. The algorithm sets it so that it will only produce notes from a major or minor pentatonic scale in order to reduce dissonance in the generation as much as possible. The brightness level of each pixel corresponds to a note, with darker pixels corresponding to lower range notes and brighter pixels corresponding to higher range notes. But the MIDI file produced is supposed to have four tracks for a chorale style composition, so each track has different conversions of brightness to pitch so that they can fit within their respective soprano, alto, tenor, or bass range. Rhythm is determined very simply, with one pixel essentially corresponding to one "tick" or sixteenth note. The algorithm is set to produce a MIDI file that runs at 200bpm.
+
+In order to further create interest in the composition, the algorithm is set to change keys periodically. The harmonic rhythm is predetermined, with the composition staying in one key for 6 bars before changing. However the key that it changes to is random, so it could move to any other major or minor pentatonic scale and generate the notes based on it.
+
+With these parameters set in place, the program selects four rows at random to generate MIDI of for each voice. It is important that four *random* rows are selected, because if it simply used four rows next to each other there is a higher chance of them outputting similar MIDI by nature of the image.
+
+## Use of Output in Composition
+
+From there I imported the newly generated MIDI file into my DAW. I did not edit the MIDI itself, as I wanted it to stay faithful to the generation. I do see room for improvement in terms of the sound of the composition, but I would prefer for this improvement to come from improving the algorithm as opposed to editing its output. With the MIDI in my DAW, I selected unique synth presets for each of the four voices that I thought matched the timbral character I was going for. After that point I considered the composition finished and exported it. Additionally, I imported the MIDI to my music notation software to create a sheet music representation of the piece. 
