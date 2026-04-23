@@ -6,9 +6,9 @@ Whooshes, risers, and morphing sounds are everywhere in a lot of film and games 
 
 Thats why I want to build a tool that works the way sound designers actually work: **open a labeled material pad, pick a spot between the tags, draw the energy shape, and iterate until it's right.**
 
-## What it is (one sentence)
+## What it is 
 
-A **β-VAE** with a structured three-part latent bottleneck, trained on top of frozen EnCodec representations, with a 2D material pad pre-populated at training time by a fixed vocabulary of descriptive tags. I chose the VAE deliberately because it requires a navigable, interpretable latent space, and I think VAE would fits beat in this condition.
+A **β-VAE** with a structured three-part latent bottleneck, trained on top of frozen EnCodec representations, with a 2D material pad pre-populated at training time by a fixed vocabulary of descriptive tags. I chose the VAE because it requires a navigable latent space, and I think VAE would fits beat in this condition.
 
 ## The controls
 
@@ -25,7 +25,6 @@ After generating, the user nudges any control and regenerates.
 
 ## Pipeline
 
-Four stages. Each has defined inputs, defined outputs, and runs at a different time — so the project can be built, debugged, and resumed incrementally.
 
 ### Stage 1 — Preprocess (one-time, offline)
 
@@ -33,7 +32,6 @@ Four stages. Each has defined inputs, defined outputs, and runs at a different t
 Raw audio  →  [resample 32 kHz mono, normalize to −23 LUFS, crop to 2s]
            →  [EnCodec encoder, frozen]  →  cached latents  (shape: 128 × 100)
            →  [librosa RMS + spectral centroid]  →  cached envelopes  (shape: 2 × 100)
-           →  manifest.csv  (filename → latent_path, envelope_path, multi_hot_tags)
 ```
 
 All caches written to Google Drive. After this stage, training never touches raw audio.
@@ -43,13 +41,13 @@ All caches written to Google Drive. After this stage, training never touches raw
 ```
 Cached latents + envelopes + multi-hot tag vectors
        ↓
-   [My VAE encoder]
+   [VAE encoder]
        ↓ produces three latents:
-   ├── z_material ∈ ℝ²     — supervised by multi-label tag vector (BCE)
-   ├── z_timbre ∈ ℝ⁸       — β-VAE KL pressure for disentanglement
-   └── z_time ∈ ℝ^(C×T)    — softly regressed against envelope ground truth (MSE)
+   ├── z_material ∈ R²     — supervised by multi-label tag vector (BCE)
+   ├── z_timbre ∈ R⁸       — β-VAE KL pressure for disentanglement
+   └── z_time ∈ R^(C×T)    — softly regressed against envelope ground truth (MSE)
        ↓
-   [My VAE decoder]  →  reconstructed EnCodec latents
+   [VAE decoder]  →  reconstructed EnCodec latents
        ↓
    Loss = MSE reconstruction + β·KL terms + λ_mat·BCE + λ_env·envelope MSE
 ```
@@ -62,27 +60,6 @@ Two augmentations during training:
 - **Interpolation augmentation** — randomly blend `z_material` from pairs of samples so the decoder handles in-between points on the pad.
 - **Envelope augmentation** — time-stretch and amplitude-modulate samples, recompute envelopes, train the model to match.
 
-### Stage 3 — Analyze (one-time after training)
-
-```
-Trained checkpoint
-       ↓
-   For each tag: compute centroid of z_material across all training samples carrying that tag
-       ↓  →  tag_positions.json  (tag name → 2D coordinate)
-       ↓
-   [PCA on pooled z_timbre across dataset]  →  principal axes of timbral variation
-       ↓
-   Synthesize traversals along each axis, listen  →  named sliders
-       ↓  →  axes.json  (slider name → latent direction vector)
-       ↓
-   [Linear probe on z_material]  →  tag-level classification accuracy
-```
-
-
-
-## Technical Summary
-
-**Architecture.** Frozen EnCodec 32 kHz mono for waveform ↔ latent conversion. A small 1D-convolutional VAE operates on EnCodec's continuous (pre-quantization) latents at ~50 Hz. Total trainable parameters ~5–15M.
 
 **Loss:**
 ```
@@ -93,13 +70,12 @@ L = L_recon(MSE on EnCodec latents)
 ```
 Starting hyperparameters: β = 1.0 (raised to 4.0 if disentanglement is poor), λ_mat = 0.5, λ_env = 0.1.
 
-Multi-label BCE is used instead of cross-entropy because samples can carry multiple tags simultaneously (e.g., `metal + rough + bright`), and this richer supervision gives the 2D pad more meaningful structure than hard mutually-exclusive classes would.
+Multi BCE is used instead of cross-entropy because samples can carry multiple tags simultaneously and supervision gives the 2D pad more meaningful structure than hard mutually-exclusive classes would.
 
-**Post-hoc analysis.** Tag positions on the pad are computed as `z_material` centroids per tag. PCA over pooled `z_timbre` surfaces principal timbral axes, named by listening. Linear regression from `z_timbre` to acoustic features (spectral flatness, roughness) provides secondary attribute directions.
 
 ## References and reused components
 
-I'm not building from scratch. I will reference following models to build the model.
+reference following models to build the model.
 
 **Used frozen (no training):**
 - **EnCodec** — Défossez et al. 2022 ([`facebookresearch/encodec`](https://github.com/facebookresearch/encodec), via [`facebookresearch/audiocraft`](https://github.com/facebookresearch/audiocraft)). Waveform ↔ latent.
@@ -118,17 +94,6 @@ I'm not building from scratch. I will reference following models to build the mo
 ~5–10 hours of whooshes, risers, and Foley recordings from Freesound (Creative Commons) and the BBC Sound Effects Library (educational use). Each sample gets a multi-hot vector across the 18-tag vocabulary.
 
 Tagging protocol: will utilize the tagging protocol in sfx library to speed up workflow.
-## Evaluation
-
-**Objective metrics:**
-- Reconstruction quality (multi-scale spectral loss) on held-out samples.
-- Envelope-following error (MSE + correlation between drawn and generated envelopes).
-- Per-tag AP (average precision) from the tag classification heads — validates that the 2D pad actually organizes by label.
-- Fréchet Audio Distance (FAD) against held-out whooshes.
-
-**Subjective evaluation:**
-- Axis interpretability study — 8–12 sound design / film students describe what changes when traversing each discovered `z_timbre` axis; measure inter-rater agreement.
-- Pad navigability study — given a target description ("wet, airy whoosh"), can participants find it on the pad faster than in a sample library?
 
 ## Scope
 
