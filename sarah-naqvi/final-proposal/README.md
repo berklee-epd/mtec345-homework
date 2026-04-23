@@ -15,7 +15,7 @@ In terms of data and source material, I'll be starting with the [example media p
 
 
 ## How you plan to develop the project, including your first concrete steps
-- Step 1: Start with the media pipe example code that recognizes the hands and face 
+- Step 1: Start with the media pipe example code that recognizes the hands and face and make sure I can get it running on my laptop
 - Step 2: Media pipe sends OSC to Wekinator to be able to recognize my gestures as classes
 - Step 3: I'll train wekinator with the "All Classifiers" type to recognize the distinct flute fingerings
 - Step 4:  Wekinator sends OSC to Max that has the udp send and recieve objects that I can use to trigger samples to play, and allow for effects processing to be turned on and off.
