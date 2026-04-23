@@ -23,6 +23,9 @@ In terms of data and source material, I'll be starting with the [example media p
 
 Some effects I plan to explore include reverb, bitcrusher, and delay. Additionally, some background sounds I have in mind are ambient crackly sounds and pads.   
 
+## Diagram
+![Final Proposal Diagram](FinalProposal.png)
+
 ## Questions, concerns, risks
 I'm not sure how clear my flute fingering gestures will be for Media Pipe and Wekinator to identify. Perhaps I will need to get creative with the gestures I provide whilst playing the flute in order to make them more obvious. Instead of keeping my fingers close to the keys, I will probably need to lift them more or move my eyebrows for gestures. I'm also concerned that perhaps the effects processing on the flute audio will be difficult to implement since I haven't tried that with Max before, but I think a good backup plan would be to use gestures to trigger samples while I'm playing, so there is still some interactivity even without effects processing. 
 ###  Stretch Goal
