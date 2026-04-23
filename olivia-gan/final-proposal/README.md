@@ -1,10 +1,10 @@
-## Final Project Prposal
+## Final Project Proposal
 
 ![](mediapipe.png)
 
 ### What I Would Like to Do?
 
-For my final project, I want to build a real-time performance in which my hand gestures control processing of my live vocal inside Ableton Live. I am very inspired by last week's lesson and I plan to use MediaPipe to track my hands through a webcam and then using TouchDesigner to turn that gesture data into control information. My goal is to design expressive vocal effects, such as vocoding, tremolo, reverb, delay, and auto-shifting, where my physical movement dynamically alter these parameters. I want the final result to feel like a complete intergrated performance instrument and that my body becomes the visible automation engine of the process of sound design.
+For my final project, I want to build a real-time performance in which my hand gestures control processing of my live vocal inside Ableton Live. I am very inspired by last week's lesson and I plan to use MediaPipe to track my hands through a webcam and then using TouchDesigner to turn that gesture data into control information. My goal is to design expressive vocal effects, such as vocoding, tremolo, reverb, delay, and auto-shifting, where my physical movement dynamically alters these parameters. I want the final result to feel like a complete integrated performance instrument and that my body becomes the visible automation engine of the process of sound design.
 
 ### Why It Matters?
 
@@ -32,7 +32,7 @@ I plan to develop the project by first getting a basic technical pipeline workin
 
 ### Questions and Concerns
 
-My biggest concern is MediaPipe, mainly because I am completely new to it and have not actually used it before. I think a large part of this project will simply be learning the basics well enough to build a working pipeline. Because of that, one challenege is that I may need much more time than expected just to understand the setup, workflow, and limitations of the tool. 
+My biggest concern is MediaPipe, mainly because I am completely new to it and have not actually used it before. I think a large part of this project will simply be learning the basics well enough to build a working pipeline. Because of that, one challenge is that I may need much more time than expected just to understand the setup, workflow, and limitations of the tool. 
 
 I am also not yet sure how well MediaPipe will track two hands at the same time in a performance situation, especially if both hands are moving quickly or making different gestures. Another question I have is how reliably it can recognize each hand as separate, so that the system does not confuse my left and right hands when they are doing different things. Beyond that, I am concerned about tracking accuracy, latency, and whether the gesture data will be stable enough to use for real-time musical control. 
 
