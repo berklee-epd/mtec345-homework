@@ -61,6 +61,29 @@
         accent-color: #2a6;
         cursor: pointer;
       }
+      
+      .pose-count {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .pose-count button {
+        background: #222;
+        border: 1px solid #444;
+        color: #eee;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .pose-count span {
+        min-width: 6rem;
+        text-align: center;
+        font-size: 0.9rem;
+      }
+      
 
       .video-wrap {
         position: relative;
@@ -134,6 +157,14 @@
         <input id="osc-port" type="number" value="9000" />
       </div>
 
+      <div>
+        <label>Max poses</label><br />
+        <div class="pose-count">
+          <button id="pose-minus" type="button">-</button>
+          <span id="pose-count-label">1 pose</span>
+          <button id="pose-plus" type="button">+</button>
+        </div>
+      </div>
     </div>
 
     <div class="video-wrap">

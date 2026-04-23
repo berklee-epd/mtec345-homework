@@ -13,11 +13,10 @@ const CLIENT_DIST = path.resolve(fileURLToPath(import.meta.url), "../../../clien
 // Fixed OSC addresses
 const ADDR_HAND_0 = "/hand/0";
 const ADDR_HAND_1 = "/hand/1";
-const ADDR_FACE   = "/face";
-const ADDR_POSE   = "/pose";
+const ADDR_FACE = "/face";
+const ADDR_POSE_PREFIX = "/pose";
 
 const HAND_LANDMARKS = 21;
-const HANDS_MAX      = 2;
 const POSE_LANDMARKS = 33;
 
 const app = express();
@@ -41,6 +40,15 @@ function handFloats(hand: { x: number; y: number; z: number }[] | undefined): nu
   return floats;
 }
 
+function poseFloats(pose: { x: number; y: number; z: number }[] | undefined): number[] {
+  const floats: number[] = [];
+  for (let n = 0; n < POSE_LANDMARKS; n++) {
+    const lm = pose?.[n];
+    floats.push(lm?.x ?? 0, lm?.y ?? 0, lm?.z ?? 0);
+  }
+  return floats;
+}
+
 wss.on("connection", (ws) => {
   console.log("Client connected");
   send(ws, { type: "status", message: "OSC → 127.0.0.1:9000" });
@@ -59,33 +67,37 @@ wss.on("connection", (ws) => {
       const status = `OSC → ${msg.osc.host}:${msg.osc.port}`;
       console.log(status);
       send(ws, { type: "status", message: status });
+      return;
+    }
 
-    } else if (msg.type === "landmarks") {
-      const osc = (m: Message) => oscClient.send(m, (err: unknown) => {
-        if (err) console.error("OSC send error:", err);
-      });
+    if (msg.type !== "landmarks") return;
 
-      if (msg.task === "hand") {
-        osc(new Message(ADDR_HAND_0, ...handFloats(msg.hands?.[0])));
-        osc(new Message(ADDR_HAND_1, ...handFloats(msg.hands?.[1])));
+    const osc = (m: Message) =>
+        oscClient.send(m, (err: unknown) => {
+          if (err) console.error("OSC send error:", err);
+        });
+
+    if (msg.task === "hand") {
+      osc(new Message(ADDR_HAND_0, ...handFloats(msg.hands?.[0])));
+      osc(new Message(ADDR_HAND_1, ...handFloats(msg.hands?.[1])));
+      return;
+    }
+
+    if (msg.task === "face") {
+      const floats: number[] = [];
+      for (const n of FACE_KEY_INDICES) {
+        const lm = msg.face?.[n];
+        floats.push(lm?.x ?? 0, lm?.y ?? 0, lm?.z ?? 0);
       }
+      osc(new Message(ADDR_FACE, ...floats));
+      return;
+    }
 
-      if (msg.task === "face") {
-        const floats: number[] = [];
-        for (const n of FACE_KEY_INDICES) {
-          const lm = msg.face?.[n];
-          floats.push(lm?.x ?? 0, lm?.y ?? 0, lm?.z ?? 0);
-        }
-        osc(new Message(ADDR_FACE, ...floats));
-      }
-      
-      if (msg.task === "pose") {
-        const floats: number[] = [];
-        for (let n = 0; n < POSE_LANDMARKS; n++) {
-          const lm = msg.pose?.[n];
-          floats.push(lm?.x ?? 0, lm?.y ?? 0, lm?.z ?? 0);
-        }
-        osc(new Message(ADDR_POSE, ...floats));
+    if (msg.task === "pose") {
+      const poses = msg.poses ?? [];
+      for (let i = 0; i < poses.length; i++) {
+        const floats = poseFloats(poses[i]);
+        osc(new Message(`${ADDR_POSE_PREFIX}/${i}`, ...floats));
       }
     }
   });

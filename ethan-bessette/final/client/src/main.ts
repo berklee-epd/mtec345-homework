@@ -13,31 +13,32 @@ import { FACE_KEY_INDICES, FACE_KEY_INDEX_SET } from "../../shared/face-key-indi
 
 // ─── DOM ─────────────────────────────────────────────────────────────────────
 
-const video      = document.getElementById("video")     as HTMLVideoElement;
-const canvas     = document.getElementById("canvas")    as HTMLCanvasElement;
-const ctx        = canvas.getContext("2d")!;
-const statusEl  = document.getElementById("status")!;
-const dbgHand0  = document.getElementById("dbg-hand0")!;
-const dbgHand1  = document.getElementById("dbg-hand1")!;
-const dbgFace   = document.getElementById("dbg-face")!;
-const dbgPose   = document.getElementById("dbg-pose")!;
-const chkHand    = document.getElementById("chk-hand")  as HTMLInputElement;
-const chkFace    = document.getElementById("chk-face")  as HTMLInputElement;
-const chkPose    = document.getElementById("chk-pose")  as HTMLInputElement;
-const hostInput  = document.getElementById("osc-host")  as HTMLInputElement;
-const portInput  = document.getElementById("osc-port")  as HTMLInputElement;
+const video = document.getElementById("video") as HTMLVideoElement;
+const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+const ctx = canvas.getContext("2d")!;
+const statusEl = document.getElementById("status")!;
+const dbgHand0 = document.getElementById("dbg-hand0")!;
+const dbgHand1 = document.getElementById("dbg-hand1")!;
+const dbgFace = document.getElementById("dbg-face")!;
+const dbgPose = document.getElementById("dbg-pose")!;
+const chkHand = document.getElementById("chk-hand") as HTMLInputElement;
+const chkFace = document.getElementById("chk-face") as HTMLInputElement;
+const chkPose = document.getElementById("chk-pose") as HTMLInputElement;
+const hostInput = document.getElementById("osc-host") as HTMLInputElement;
+const portInput = document.getElementById("osc-port") as HTMLInputElement;
+const poseMinus = document.getElementById("pose-minus") as HTMLButtonElement;
+const posePlus = document.getElementById("pose-plus") as HTMLButtonElement;
+const poseCountLabel = document.getElementById("pose-count-label")!;
 
 // ─── OSC addresses (hard-coded, must match server) ───────────────────────────
 
-const HAND_LANDMARKS     = 21;
-const HANDS_MAX          = 2;
-const FACE_KEY_COUNT     = FACE_KEY_INDICES.length; // 136
+const HAND_LANDMARKS = 21;
+const FACE_KEY_COUNT = FACE_KEY_INDICES.length;
 const POSE_LANDMARKS = 33;
 
-const ADDR_HAND_0_FLOATS = HAND_LANDMARKS * 3; // 63
-const ADDR_HAND_1_FLOATS = HAND_LANDMARKS * 3; // 63
-const ADDR_FACE_FLOATS   = FACE_KEY_COUNT  * 3; // 408
-const ADDR_POSE_FLOATS   = POSE_LANDMARKS * 3; // 99
+// ─── Pose config ─────────────────────────────────────────────────────────────
+
+let poseCount = 1;
 
 // ─── WebSocket ───────────────────────────────────────────────────────────────
 
@@ -46,7 +47,7 @@ let ws: WebSocket = connect();
 
 function connect(): WebSocket {
   const socket = new WebSocket(wsUrl);
-  socket.onopen  = () => setStatus("Connected");
+  socket.onopen = () => setStatus("Connected");
   socket.onclose = () => {
     setStatus("Disconnected — retrying…");
     setTimeout(() => { ws = connect(); }, 2000);
@@ -62,73 +63,75 @@ function sendWs(msg: ToServer) {
   if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(msg));
 }
 
-// ─── OSC Config ──────────────────────────────────────────────────────────────
 
-function sendOscConfig() {
-  sendWs({ type: "config", osc: { host: hostInput.value, port: Number(portInput.value) } });
-}
+poseMinus.addEventListener("click", async () => {
+  poseCount = Math.max(1, poseCount - 1);
+  renderPoseCount();
+  await applyPoseOptions();
+});
+
+posePlus.addEventListener("click", async () => {
+  poseCount = Math.min(8, poseCount + 1);
+  renderPoseCount();
+  await applyPoseOptions();
+});
+
+// Keep the other input types
+chkHand.addEventListener("change", () => updateOscDebug(false, false, false, false));
+chkFace.addEventListener("change", () => updateOscDebug(false, false, false, false));
+chkPose.addEventListener("change", () => updateOscDebug(false, false, false, false));
 
 hostInput.addEventListener("change", sendOscConfig);
 portInput.addEventListener("change", sendOscConfig);
 
-// ─── Task Checkboxes ─────────────────────────────────────────────────────────
-
-chkHand.addEventListener("change", () => {
-  //if (!chkHand.checked && !chkFace.checked) chkFace.checked = true;
-  updateOscDebug(false, false, false, false);
-});
-chkFace.addEventListener("change", () => {
-  //if (!chkHand.checked && !chkFace.checked) chkHand.checked = true;
-  updateOscDebug(false, false, false, false);
-});
-chkHand.addEventListener("change", () => {
-  //if (!chkHand.checked && !chkFace.checked) chkFace.checked = true;
-  updateOscDebug(false, false, false, false);
-})
-
 // ─── MediaPipe Init ──────────────────────────────────────────────────────────
 
-const WASM_URL   = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm";
+const WASM_URL = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm";
 const MODEL_BASE = "https://storage.googleapis.com/mediapipe-models";
+
+let handLandmarker: HandLandmarker | null = null;
+let faceLandmarker: FaceLandmarker | null = null;
+let poseLandmarker: PoseLandmarker | null = null;
 
 async function initMediaPipe() {
   setStatus("Loading MediaPipe…");
   const vision = await FilesetResolver.forVisionTasks(WASM_URL);
 
   handLandmarker = await HandLandmarker.createFromModelPath(
-    vision,
-    `${MODEL_BASE}/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`
+      vision,
+      `${MODEL_BASE}/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`
   );
   await handLandmarker.setOptions({ runningMode: "VIDEO", numHands: 2 });
 
   faceLandmarker = await FaceLandmarker.createFromModelPath(
-    vision,
-    `${MODEL_BASE}/face_landmarker/face_landmarker/float16/1/face_landmarker.task`
+      vision,
+      `${MODEL_BASE}/face_landmarker/face_landmarker/float16/1/face_landmarker.task`
   );
   await faceLandmarker.setOptions({ runningMode: "VIDEO" });
-  
+
   poseLandmarker = await PoseLandmarker.createFromModelPath(
       vision,
       `${MODEL_BASE}/pose_landmarker/pose_landmarker_heavy/float16/1/pose_landmarker_heavy.task`
   );
-  await poseLandmarker.setOptions({ runningMode: "VIDEO" });
+  await applyPoseOptions();
 
   setStatus("Ready");
 }
 
-let handLandmarker: HandLandmarker | null = null;
-let faceLandmarker: FaceLandmarker | null = null;
-let poseLandmarker: PoseLandmarker | null = null;
+async function applyPoseOptions() {
+  if (!poseLandmarker) return;
+  await poseLandmarker.setOptions({
+    runningMode: "VIDEO",
+    numPoses: poseCount,
+  });
+}
 
-// ─── Webcam ───────────────────────────────────────────────────────────────────
+// ─── Webcam ─────────────────────────────────────────────────────────────────
 
 async function startCamera() {
   const stream = await navigator.mediaDevices.getUserMedia({ video: true });
   video.srcObject = stream;
-  video.style.position = "absolute";
-  video.style.left = "-9999px";
-  video.style.width = "1px";
-  video.style.height = "1px";
+  video.style.transform = "scaleX(-1)";
   canvas.style.transform = "scaleX(-1)";
   await new Promise<void>((res) => { video.onloadeddata = () => res(); });
 }
@@ -146,13 +149,13 @@ function drawHands(result: HandLandmarkerResult) {
 function drawFace(result: FaceLandmarkerResult) {
   const draw = new DrawingUtils(ctx);
   for (const landmarks of result.faceLandmarks) {
-    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_TESSELATION,    { color: "#ffffff18", lineWidth: 1 });
-    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_FACE_OVAL,      { color: "#4488ff88", lineWidth: 1 });
-    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_RIGHT_EYE,      { color: "#ff446688", lineWidth: 1 });
-    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LEFT_EYE,       { color: "#44ff6688", lineWidth: 1 });
-    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_RIGHT_EYEBROW,  { color: "#ff446688", lineWidth: 1 });
-    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LEFT_EYEBROW,   { color: "#44ff6688", lineWidth: 1 });
-    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LIPS,           { color: "#ffaa0088", lineWidth: 1 });
+    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_TESSELATION, { color: "#ffffff18", lineWidth: 1 });
+    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_FACE_OVAL, { color: "#4488ff88", lineWidth: 1 });
+    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_RIGHT_EYE, { color: "#ff446688", lineWidth: 1 });
+    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LEFT_EYE, { color: "#44ff6688", lineWidth: 1 });
+    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_RIGHT_EYEBROW, { color: "#ff446688", lineWidth: 1 });
+    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LEFT_EYEBROW, { color: "#44ff6688", lineWidth: 1 });
+    draw.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LIPS, { color: "#ffaa0088", lineWidth: 1 });
 
     for (let i = 0; i < landmarks.length; i++) {
       if (!FACE_KEY_INDEX_SET.has(i)) continue;
@@ -166,13 +169,16 @@ function drawFace(result: FaceLandmarkerResult) {
 }
 
 function drawPose(result: PoseLandmarkerResult) {
-  const draw = new DrawingUtils(ctx)
+  const draw = new DrawingUtils(ctx);
   for (const landmarks of result.landmarks) {
     draw.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, { color: "#00ff88", lineWidth: 2 });
     draw.drawLandmarks(landmarks, { color: "#ff0055", lineWidth: 1, radius: 3 });
   }
 }
 
+function sendPoseBatch(result: PoseLandmarkerResult) {
+  sendWs({ type: "landmarks", task: "pose", poses: result.landmarks });
+}
 
 // ─── Render Loop ─────────────────────────────────────────────────────────────
 
@@ -191,6 +197,7 @@ function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const now = performance.now();
   const throttle = now - lastSentAt > SEND_INTERVAL_MS;
+
   let hand0 = false, hand1 = false, face = false, pose = false;
 
   if (chkHand.checked && handLandmarker) {
@@ -207,12 +214,12 @@ function loop() {
     face = result.faceLandmarks.length > 0;
     if (throttle) sendWs({ type: "landmarks", task: "face", face: result.faceLandmarks[0] });
   }
-  
+
   if (chkPose.checked && poseLandmarker) {
     const result = poseLandmarker.detectForVideo(video, now);
     drawPose(result);
     pose = result.landmarks.length > 0;
-    if (throttle) sendWs({ type: "landmarks", task: "pose", pose: result.landmarks });
+    if (throttle) sendPoseBatch(result);
   }
 
   if (throttle) {
@@ -224,10 +231,15 @@ function loop() {
 // ─── OSC Debug Panel ─────────────────────────────────────────────────────────
 
 const col = 10;
-dbgHand0.textContent = `/hand/0`.padEnd(col) + `${ADDR_HAND_0_FLOATS} floats   # hand 0: 21 landmarks × x y z  (zeros when not detected)`;
-dbgHand1.textContent = `/hand/1`.padEnd(col) + `${ADDR_HAND_1_FLOATS} floats   # hand 1: 21 landmarks × x y z  (zeros when not detected)`;
-dbgFace.textContent  = `/face`.padEnd(col)   + `${ADDR_FACE_FLOATS} floats  # 136 key points × x y z  (zeros when not detected)`;
-dbgPose.textContent =  `/pose`.padEnd(col)   + `${ADDR_POSE_FLOATS} floats  # 33 landmarks × x y z  (zeros when not detected)`;
+dbgHand0.textContent = `/hand/0`.padEnd(col) + `${HAND_LANDMARKS * 3} floats   # hand 0`;
+dbgHand1.textContent = `/hand/1`.padEnd(col) + `${HAND_LANDMARKS * 3} floats   # hand 1`;
+dbgFace.textContent = `/face`.padEnd(col) + `${FACE_KEY_COUNT * 3} floats   # face`;
+dbgPose.textContent = `/pose/N`.padEnd(col) + `${POSE_LANDMARKS * 3} floats   # pose index 0..${poseCount - 1}`;
+
+function renderPoseCount() {
+  poseCountLabel.textContent = `${poseCount} pose${poseCount === 1 ? "" : "s"}`;
+  dbgPose.textContent = `/pose/0..${poseCount - 1}`.padEnd(col) + `${POSE_LANDMARKS * 3} floats   # one OSC message per detected pose`;
+}
 
 function setOscRowState(el: Element, enabled: boolean, sending: boolean) {
   el.classList.toggle("enabled", enabled && !sending);
@@ -237,17 +249,23 @@ function setOscRowState(el: Element, enabled: boolean, sending: boolean) {
 function updateOscDebug(hand0: boolean, hand1: boolean, face: boolean, pose: boolean) {
   setOscRowState(dbgHand0, chkHand.checked, chkHand.checked && hand0);
   setOscRowState(dbgHand1, chkHand.checked, chkHand.checked && hand1);
-  setOscRowState(dbgFace,  chkFace.checked, chkFace.checked && face);
-  setOscRowState(dbgPose, chkPose.checked, chkPose.checked && pose)
+  setOscRowState(dbgFace, chkFace.checked, chkFace.checked && face);
+  setOscRowState(dbgPose, chkPose.checked, chkPose.checked && pose);
 }
 
 // ─── Utility ─────────────────────────────────────────────────────────────────
+
+function sendOscConfig() {
+  sendWs({ type: "config", osc: { host: hostInput.value, port: Number(portInput.value) } });
+}
 
 function setStatus(msg: string) {
   statusEl.textContent = msg;
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
+
+renderPoseCount();
 
 (async () => {
   updateOscDebug(false, false, false, false);
