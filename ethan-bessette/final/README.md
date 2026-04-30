@@ -1,44 +1,27 @@
-# MediaPipe → OSC
+# Gesture based experience in Unity
 
-Browser-based hand/face landmark detection (via MediaPipe) that streams
-landmark data to a Node.js server, which forwards it as OSC UDP messages.
 
-## Quick Start
+## Documentation
 
-```bash
-npm install
-npm run dev
-```
+First, I converted the web example to allow multiple people to be recognized. I also added pose recognition in addition to hand and face recognition. I then tried to implement it in python and ran into some issues with documentation.
 
-Open http://localhost:5173 in a browser with webcam access (Vite’s default; if that port is busy, use the URL printed in the terminal).
+I was curious how difficult it would be to get working in Unity. I ended up using YOLO instead of MediaPipe because it was easier for me to get into .onnx format.
 
-## Architecture
+Steps:
 
-```
-Browser (Vite dev server :5173)
-  └─ webcam → @mediapipe/tasks-vision (WASM)
-  └─ landmarks → WebSocket (/ws) → Node server (:3001)
-                                      └─ OSC UDP → configurable host:port
-```
+1. Export YOLO pose recognizer to onnx, import to Unity
+2. Follow the webcam documentation combined with help from a coding agent to get the proper permissions to select a camera and use it in Unity.
+3. Test the camera in Unity, create a small scene that shows the camera.
+4. Write a script to stream the webcam data to the pose recognizer. Format the data in an easy to read way
+    - make landmarks into an enum
+    - make a struct for keypoints to easily name them in the inspector and pair them with their position
+    - make a class pose to hold instances of all the key point structs to make it easier to work with a list of all people recognized
+    - create logic to only add a pose to the list if the confidence rating is above a threshold. Send 0s for all key point positions if their confidence is below a threshold.
+    - use multiple workers, one to run the model, and the other for everything else
+    - convert the webcam data to tensor with shape TensorShape(1, 3, height, width) # batch, RGB, pixel H and W
+    - a list of raw landmarks that I studied to understand the format to convert into the pose class and landmark structs I mentioned earlier
 
-## OSC Messages
-
-Sent as separate UDP messages at ~30fps (throttled on the client):
-
-| Address   | Args                                                                                                                 |
-| --------- | -------------------------------------------------------------------------------------------------------------------- |
-| `/hand/0` | 63 floats: 21 landmarks × `x y z` (normalized image coords; see MediaPipe hand model)                                |
-| `/hand/1` | Same layout for the second detected hand (zeros if absent)                                                           |
-| `/face`   | 408 floats: 136 key landmark indices × `x y z` (subset of the 478-point face mesh; see `shared/face-key-indices.ts`) |
-
-## UI Controls
-
-- **Hand / Face** — enable either or both landmark tasks
-- **OSC Host / Port** — where to send OSC (default: `127.0.0.1:9000`)
-
-## Production Build
-
-```bash
-npm run build   # builds client to client/dist, compiles server
-npm run start   # runs the server (serves client/dist at :3001)
-```
+5. Implement Dynamic Time Warping
+    - I downloaded a package with a useful UI for training models within Unity that saves the weights to a JSON file. It works similar to wekinator, you can add samples, train on the samples, then enter prediction mode
+    - It wasn't using actual DTW, so I got help from a coding agent to modify it use use true DTW
+    - I tested the training a little and it worked! I didn't save the training though because I was sitting and I want to be standing
