@@ -36,7 +36,7 @@ Once it is trained, the style label it outputs controls the rest of the system: 
 
 - **Wekinator** — real-time interactive ML. Takes live gamepad data and classifies it into style groups based on my own demonstrations, no need to write the model by hand
 - **Suno** — generating music from text. I will write prompts to generate four loops that sound clearly different from each other, one for each style the ML detects
-- **ElevenLabs** — expressive voice generation. Pre-generate a few voice lines that react to the player's style, adds some personality and feedback to the experience
+- **ElevenLabs** — ElevenLabs — sound design. A friend recommended it for generating custom sound effects and audio textures. I plan to explore what it can do and use it for some part of the sound design, not totally sure yet exactly how.
 - **Tone.js + Gamepad API** — low-latency browser audio. Handles the real-time synth control in the browser driven by whatever Wekinator outputs
 - **Cursor** — writing and editing code fast. I will use it to write the browser game code and the Node.js bridge script
 - **Claude** — thinking through problems. Helps me figure out the system design, debug things when they break, and write documentation
@@ -58,5 +58,4 @@ Once it is trained, the style label it outputs controls the rest of the system: 
 - How many examples does Wekinator need to actually classify well? Will four styles be too many or is that fine?
 
 **Stretch goals:**
-- Show on screen which style the model currently thinks you are playing and how confident it is
 - Compare the ML classifier against a simple rule-based version to see if training it actually makes a difference
