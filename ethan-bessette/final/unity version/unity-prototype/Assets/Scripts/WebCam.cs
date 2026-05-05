@@ -59,6 +59,9 @@ public class WebCam : MonoBehaviour
 
     public WebCamTexture webcamTexture;
 
+    [SerializeField] private string preferredCameraName = "FaceTime";
+    [SerializeField] private float scaler = 10f;
+
     void Start()
     {
 #if UNITY_IOS || UNITY_WEBGL
@@ -74,11 +77,40 @@ public class WebCam : MonoBehaviour
         InitializeCamera();
     }
 
-    [SerializeField] private float scaler = 1f;
-
     private void InitializeCamera()
     {
-        webcamTexture = new WebCamTexture();
+        WebCamDevice[] devices = WebCamTexture.devices;
+
+        foreach (WebCamDevice device in devices)
+        {
+            Debug.Log($"Camera found: {device.name}");
+        }
+
+        string selectedCameraName = null;
+
+        foreach (WebCamDevice device in devices)
+        {
+            if (device.name.Contains(preferredCameraName, StringComparison.OrdinalIgnoreCase))
+            {
+                selectedCameraName = device.name;
+                break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(selectedCameraName) && devices.Length > 0)
+        {
+            selectedCameraName = devices[0].name;
+        }
+
+        if (string.IsNullOrEmpty(selectedCameraName))
+        {
+            Debug.LogWarning("No webcam devices found.");
+            return;
+        }
+
+        Debug.Log($"Using camera: {selectedCameraName}");
+
+        webcamTexture = new WebCamTexture(selectedCameraName);
         Renderer renderer = GetComponent<Renderer>();
         renderer.material.mainTexture = webcamTexture;
         webcamTexture.Play();

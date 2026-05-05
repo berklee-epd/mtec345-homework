@@ -4,6 +4,8 @@ using RTMLToolKit;
 
 public class DetectGestures : MonoBehaviour
 {
+    public static DetectGestures Instance;
+    
     private const int KeypointCount = 17;
     private const int CoordinatesPerKeypoint = 2;
     private const int LandmarkFrameSize = KeypointCount * CoordinatesPerKeypoint;
@@ -54,6 +56,17 @@ public class DetectGestures : MonoBehaviour
 
     private readonly List<float[]> recordedGestureFrames = new List<float[]>();
     private readonly List<float[]> predictionGestureFrames = new List<float[]>();
+    
+    void Awake()
+    {
+        if(Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 
     private void Start()
     {
