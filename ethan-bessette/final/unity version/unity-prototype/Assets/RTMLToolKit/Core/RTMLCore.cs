@@ -34,13 +34,19 @@ namespace RTMLToolKit
     }
 
     [Serializable]
+    class SequenceData
+    {
+        public List<float> values;
+    }
+
+    [Serializable]
     class KNNData
     {
         public int inputSize;
         public int outputSize;
         public int k;
-        public List<List<float>> trainInputs;
-        public List<List<float>> trainOutputs;
+        public List<SequenceData> trainInputs;
+        public List<SequenceData> trainOutputs;
     }
 
     [Serializable]
@@ -50,8 +56,8 @@ namespace RTMLToolKit
         public int outputSize;
         public int frameSize;
         public float similarityThreshold; // EKLENDI: Eşleşme eşiği
-        public List<List<float>> templates;
-        public List<List<float>> templateOutputs;
+        public List<SequenceData> templates;
+        public List<SequenceData> templateOutputs;
     }
 
     /// <summary>
@@ -250,13 +256,13 @@ namespace RTMLToolKit
                 inputSize = inputSize,
                 outputSize = outputSize,
                 k = knn.k,
-                trainInputs = new List<List<float>>(),
-                trainOutputs = new List<List<float>>()
+                trainInputs = new List<SequenceData>(),
+                trainOutputs = new List<SequenceData>()
             };
             foreach (var inp in knn.trainInputs)
-                data.trainInputs.Add(new List<float>(inp));
+                data.trainInputs.Add(new SequenceData { values = new List<float>(inp) });
             foreach (var outp in knn.trainOutputs)
-                data.trainOutputs.Add(new List<float>(outp));
+                data.trainOutputs.Add(new SequenceData { values = new List<float>(outp) });
 
             File.WriteAllText(path, JsonUtility.ToJson(data, true));
             Debug.Log($"[RTMLCore] KNNClassifier model saved to {path}");
@@ -271,13 +277,13 @@ namespace RTMLToolKit
                 outputSize = outputSize,
                 frameSize = dtw.frameSize,
                 similarityThreshold = dtw.similarityThreshold,
-                templates = new List<List<float>>(),
-                templateOutputs = new List<List<float>>()
+                templates = new List<SequenceData>(),
+                templateOutputs = new List<SequenceData>()
             };
             foreach (var t in dtw.templates)
-                data.templates.Add(new List<float>(t));
+                data.templates.Add(new SequenceData { values = new List<float>(t) });
             foreach (var o in dtw.templateOutputs)
-                data.templateOutputs.Add(new List<float>(o));
+                data.templateOutputs.Add(new SequenceData { values = new List<float>(o) });
 
             File.WriteAllText(path, JsonUtility.ToJson(data, true));
             Debug.Log($"[RTMLCore] DTWRecognizer model saved to {path}");
@@ -367,8 +373,8 @@ namespace RTMLToolKit
 
             for (int i = 0; i < data.trainInputs.Count; i++)
             {
-                knn.trainInputs.Add(data.trainInputs[i].ToArray());
-                knn.trainOutputs.Add(data.trainOutputs[i].ToArray());
+                knn.trainInputs.Add(data.trainInputs[i].values.ToArray());
+                knn.trainOutputs.Add(data.trainOutputs[i].values.ToArray());
             }
 
             model = knn;
@@ -393,9 +399,9 @@ namespace RTMLToolKit
             this.dtwFrameSize = loadedFrameSize;
 
             foreach (var t in data.templates)
-                dtw.templates.Add(t.ToArray());
+                dtw.templates.Add(t.values.ToArray());
             foreach (var o in data.templateOutputs)
-                dtw.templateOutputs.Add(o.ToArray());
+                dtw.templateOutputs.Add(o.values.ToArray());
 
             model = dtw;
             Debug.Log($"[RTMLCore] DTWRecognizer model loaded from {path}");
