@@ -43,6 +43,8 @@ public class DetectGestures : MonoBehaviour
     [Tooltip("Raw predicted output value from the model.")]
     public float predictedGestureValue = 0f;
 
+    [SerializeField] private bool predictOnStart;
+
     [Header("Keyboard Shortcuts")]
     public KeyCode startRecordKey = KeyCode.R;
     public KeyCode stopRecordKey = KeyCode.S;
@@ -92,6 +94,11 @@ public class DetectGestures : MonoBehaviour
         rtmlCore.dtwFrameSize = LandmarkFrameSize;
 
         Debug.Log($"[DetectGestures] Gesture frame size set to {LandmarkFrameSize}. Output size set to 1.");
+        
+        if (predictOnStart)
+        {
+            EnablePredict();
+        }
     }
 
     private void Update()
@@ -114,12 +121,7 @@ public class DetectGestures : MonoBehaviour
 
         if (Input.GetKeyDown(predictKey))
         {
-            rtmlCore.enableRun = !rtmlCore.enableRun;
-            predictionGestureFrames.Clear();
-            predictedGestureIndex = -1;
-            predictedGestureValue = 0f;
-
-            Debug.Log($"[DetectGestures] Real-time gesture prediction toggled to: {rtmlCore.enableRun}");
+            EnablePredict();
         }
 
         float[] currentFrame = GetCurrentLandmarkFrameOrZeros();
@@ -342,5 +344,15 @@ public class DetectGestures : MonoBehaviour
         }
 
         return Vector2.zero;
+    }
+
+    void EnablePredict()
+    {
+        rtmlCore.enableRun = !rtmlCore.enableRun;
+        predictionGestureFrames.Clear();
+        predictedGestureIndex = -1;
+        predictedGestureValue = 0f;
+        
+        Debug.Log($"[DetectGestures] Real-time gesture prediction toggled to: {rtmlCore.enableRun}");
     }
 }

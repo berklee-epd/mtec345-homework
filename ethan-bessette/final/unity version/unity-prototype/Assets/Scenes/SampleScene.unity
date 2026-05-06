@@ -17333,7 +17333,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &483373776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17408,9 +17408,10 @@ MonoBehaviour:
   gestureIndex: 0
   minimumRecordedFrames: 5
   recordZeroFramesWhenPoseMissing: 1
-  maxPredictionFrames: 90
+  maxPredictionFrames: 30
   predictedGestureIndex: -1
   predictedGestureValue: 0
+  predictOnStart: 1
   startRecordKey: 114
   stopRecordKey: 115
   trainKey: 116
@@ -17449,7 +17450,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1037160127
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17457,7 +17458,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1037160126}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81c676496b8d04c889ee80dc07f23cb5, type: 3}
   m_Name: 
@@ -37465,6 +37466,8 @@ MonoBehaviour:
   - {fileID: 0}
   visualObjectPrefab: {fileID: 3999212289830685236, guid: 82c13ab7358574d63ad11260f634adb6, type: 3}
   objectCount: 1000
+  startMode: 1
+  fieldStartDepth: 10
   edgePushForce: 0
   attractionForce: 0
   repulsionForce: 0
@@ -37474,6 +37477,7 @@ MonoBehaviour:
   minOrbitVelocity: 0.2
   maxOrbitVelocity: 10
   orbitGravity: 5
+  idleGravity: 5
   centerRepelRadius: 17.13
   centerRepelForce: 8.2
   centerRepelFalloff: 2.2
@@ -37730,7 +37734,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4790591542062550009, guid: c712748a1f7074be5927b30c402bec2a, type: 3}
       propertyPath: enableRun
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4790591542062550009, guid: c712748a1f7074be5927b30c402bec2a, type: 3}
       propertyPath: inputSize
@@ -37754,7 +37758,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4790591542062550009, guid: c712748a1f7074be5927b30c402bec2a, type: 3}
       propertyPath: modelFileName
-      value: model050526
+      value: model050626_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 4790591542062550009, guid: c712748a1f7074be5927b30c402bec2a, type: 3}
+      propertyPath: loadModelOnStart
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7160060507380491290, guid: c712748a1f7074be5927b30c402bec2a, type: 3}
       propertyPath: m_Name

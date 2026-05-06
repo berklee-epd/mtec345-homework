@@ -11,6 +11,11 @@ public class VisualController : MonoBehaviour
     [SerializeField] private VisualObject visualObjectPrefab;
     [SerializeField] private int objectCount = 50;
     
+    public enum StartMode { Center, Field }
+    [Header("Start Settings")]
+    [SerializeField] private StartMode startMode = StartMode.Center;
+    [SerializeField] private float fieldStartDepth = 5f;
+    
     public Vector3 PrefabScale => visualObjectPrefab != null
         ? visualObjectPrefab.transform.localScale
         : Vector3.one;
@@ -28,6 +33,9 @@ public class VisualController : MonoBehaviour
     public float maxOrbitVelocity = 5f;
     public float orbitGravity = 5f;
 
+    [Header("Idle Settings")]
+    public float idleGravity = 5f;
+
     [Header("Viewport Repel Mask")]
     public float centerRepelRadius = 2.5f;
     public float centerRepelForce = 12f;
@@ -40,6 +48,7 @@ public class VisualController : MonoBehaviour
     private VisualState currentState;
 
     public EdgeOrbitState EdgeOrbit;
+    public IdleState Idle;
     public LinesState Lines;
     public SquaresState Squares;
     public ScatterState Scatter;
@@ -61,6 +70,7 @@ public class VisualController : MonoBehaviour
     private void InitializeStates()
     {
         EdgeOrbit = new EdgeOrbitState(this);
+        Idle = new IdleState(this);
         Lines = new LinesState(this);
         Squares = new SquaresState(this);
         Scatter = new ScatterState(this);
@@ -72,7 +82,7 @@ public class VisualController : MonoBehaviour
         SpawnObjects();
         // Initially objects are inactive. We activate them when we start the first state.
         ActivateObjects();
-        ChangeState(EdgeOrbit);
+        ChangeState(Idle);
     }
 
     private void SpawnObjects()
@@ -105,7 +115,20 @@ public class VisualController : MonoBehaviour
         {
             if (obj != null)
             {
-                obj.ResetObject(spawnCenter);
+                if (startMode == StartMode.Center)
+                {
+                    obj.ResetObject(spawnCenter);
+                }
+                else if (startMode == StartMode.Field)
+                {
+                    float halfSize = maxOrbitDistance * 0.5f;
+                    Vector3 randomPos = new Vector3(
+                        Random.Range(-halfSize, halfSize),
+                        Random.Range(-halfSize, halfSize),
+                        Random.Range(-fieldStartDepth, fieldStartDepth)
+                    );
+                    obj.ResetObject(spawnCenter + randomPos);
+                }
                 obj.SetActive(true);
             }
         }

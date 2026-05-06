@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Gesture2
   m_EditorClassIdentifier: Assembly-CSharp::GestureSO
   gestureIndex: 2
-  gestureName: Push Away
+  gestureName: Hands Up
   attraction: 0
   repulsion: 0
   pulse: 0

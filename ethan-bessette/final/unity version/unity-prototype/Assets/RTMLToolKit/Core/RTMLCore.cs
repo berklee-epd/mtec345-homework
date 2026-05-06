@@ -118,6 +118,7 @@ namespace RTMLToolKit
         [Header("Persistence Settings")]
         [Tooltip("Filename (without extension) for saving/loading the model JSON.")]
         public string modelFileName = "defaultModel";
+        public bool loadModelOnStart = false;
 
         //--------------- Internal References ---------------//
 
@@ -134,6 +135,9 @@ namespace RTMLToolKit
             InitialiseModel();
             if (useOsc)
                 SetUpOsc();
+            
+            if (loadModelOnStart)
+                LoadModel(modelFileName);
         }
 
         void Update()
