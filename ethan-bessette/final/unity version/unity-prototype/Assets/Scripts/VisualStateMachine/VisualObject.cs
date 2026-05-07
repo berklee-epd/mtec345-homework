@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class VisualObject : MonoBehaviour
 {
-    public Renderer Renderer { get; private set; }
-    
+    private Renderer renderer;
+    private Material material;
     [Header("Physics")]
     [SerializeField] protected Vector3 velocity;
     [SerializeField] protected float friction = 0.95f;
@@ -18,7 +18,13 @@ public class VisualObject : MonoBehaviour
     
     private void Awake()
     {
-        Renderer = GetComponent<Renderer>();
+        renderer = GetComponent<Renderer>();
+        material = renderer.material;
+    }
+
+    void Start()
+    {
+        material.SetTextureScale("_BaseMap", new Vector2(Random.Range(1f, 2.6f), Random.Range(0.25f, 2.6f)));
     }
 
     public void ApplyForce(Vector3 force)
@@ -57,7 +63,7 @@ public class VisualObject : MonoBehaviour
             HandleBounds();
         }
         
-        Renderer.material.color = Color.Lerp(Renderer.material.color, Color.white, deltaTime);
+        material.color = Color.Lerp(material.color, Color.white, deltaTime);
     }
 
     protected virtual void HandleBounds()
