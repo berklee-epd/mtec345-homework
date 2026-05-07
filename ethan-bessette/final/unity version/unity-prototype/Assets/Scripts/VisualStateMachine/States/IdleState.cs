@@ -43,4 +43,10 @@ public class IdleState : VisualState
     {
         gravityPoints.Clear();
     }
+
+    public override void ApplySignals(InteractionSignals signals)
+    {
+        
+    }
 }
+

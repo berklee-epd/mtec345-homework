@@ -16,4 +16,8 @@ public class SquaresState : VisualState
     public override void Exit()
     {
     }
+
+    public override void ApplySignals(InteractionSignals signals)
+    {
+    }
 }

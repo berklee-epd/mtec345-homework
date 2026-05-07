@@ -16,4 +16,9 @@ public class CollapseState : VisualState
     public override void Exit()
     {
     }
+
+    public override void ApplySignals(InteractionSignals signals)
+    {
+    }
+    
 }

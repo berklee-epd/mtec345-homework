@@ -1,7 +1,10 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class VisualObject : MonoBehaviour
 {
+    public Renderer Renderer { get; private set; }
+    
     [Header("Physics")]
     [SerializeField] protected Vector3 velocity;
     [SerializeField] protected float friction = 0.95f;
@@ -12,6 +15,11 @@ public class VisualObject : MonoBehaviour
     [SerializeField] protected bool clampBounds = false;
 
     public Vector3 Velocity => velocity;
+    
+    private void Awake()
+    {
+        Renderer = GetComponent<Renderer>();
+    }
 
     public void ApplyForce(Vector3 force)
     {
@@ -48,6 +56,8 @@ public class VisualObject : MonoBehaviour
         {
             HandleBounds();
         }
+        
+        Renderer.material.color = Color.Lerp(Renderer.material.color, Color.white, deltaTime);
     }
 
     protected virtual void HandleBounds()
@@ -101,5 +111,11 @@ public class VisualObject : MonoBehaviour
     {
         // Legacy support if needed, or call Tick here if not called by controller
         Tick(Time.deltaTime);
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        gameObject.GetComponent<Renderer>().material.color =
+            new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f),1f);
     }
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Gesture1
   m_EditorClassIdentifier: Assembly-CSharp::GestureSO
   gestureIndex: 1
-  gestureName: Idle
+  gestureName: Hands Up
   attraction: 0
   repulsion: 0
   pulse: 0

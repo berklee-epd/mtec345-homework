@@ -13,8 +13,10 @@ public class InteractionController : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float decaySpeed = 1f;
     [SerializeField] private System.Collections.Generic.List<GestureSO> gestures;
+    [SerializeField] private float movementEnergyMultiplier = 10f;
 
     private InteractionSignals signals = new InteractionSignals();
+    private float lastHandDistance = -1f;
 
     public InteractionSignals Signals => signals;
 
@@ -64,7 +66,7 @@ public class InteractionController : MonoBehaviour
         // 8. Pass signals to VisualController
         if (visualController != null)
         {
-            //visualController.ApplySignals(signals);
+            visualController.ApplySignals(signals);
         }
     }
 
@@ -118,7 +120,21 @@ public class InteractionController : MonoBehaviour
         // a distance of 1.0 means across the whole screen.
         if (leftWrist != Vector2.zero && rightWrist != Vector2.zero)
         {
-            signals.HandDistance = Vector2.Distance(leftWrist, rightWrist);
+            float currentDistance = Vector2.Distance(leftWrist, rightWrist);
+            signals.HandDistance = currentDistance;
+
+            if (lastHandDistance >= 0)
+            {
+                float deltaDistance = Mathf.Abs(currentDistance - lastHandDistance);
+                // Add to movement energy so it can accumulate and decay
+                signals.MovementEnergy += deltaDistance * movementEnergyMultiplier;
+            }
+            lastHandDistance = currentDistance;
+        }
+        else
+        {
+            // If we lose tracking, we reset lastHandDistance to avoid huge jumps when it returns
+            lastHandDistance = -1f;
         }
 
         // Compute AverageHandHeight (normalized 0..1)
@@ -134,6 +150,13 @@ public class InteractionController : MonoBehaviour
         else if (rightWrist != Vector2.zero)
         {
             signals.HandHeight = rightWrist.y;
+        }
+
+        if (Time.frameCount % 10 == 0)
+        {
+            Debug.Log($"[InteractionController] Pose signals updated: " +
+                      $" Hand distance: {signals.HandDistance}" +
+                      $"Movement Energy: {signals.MovementEnergy}");
         }
     }
 

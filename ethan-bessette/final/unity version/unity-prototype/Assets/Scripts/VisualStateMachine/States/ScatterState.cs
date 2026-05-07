@@ -16,4 +16,8 @@ public class ScatterState : VisualState
     public override void Exit()
     {
     }
+
+    public override void ApplySignals(InteractionSignals signals)
+    {
+    }
 }

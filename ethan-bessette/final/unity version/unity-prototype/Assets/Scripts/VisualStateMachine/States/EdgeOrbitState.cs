@@ -10,6 +10,9 @@ public class EdgeOrbitState : VisualState
 
     public EdgeOrbitState(VisualController controller) : base(controller) { }
 
+    private float arrivalOrbitGravity;
+    private float arrivalCenterRepelForce;
+    
     public override void Enter()
     {
         Debug.Log("Entering EdgeOrbit State");
@@ -18,6 +21,9 @@ public class EdgeOrbitState : VisualState
         orbitAxes.Clear();
         orbitDirections.Clear();
         orbitSpeedMultipliers.Clear();
+        
+        arrivalOrbitGravity = controller.orbitGravity;
+        arrivalCenterRepelForce = controller.centerRepelForce;
 
         foreach (var obj in controller.VisualObjects)
         {
@@ -142,7 +148,18 @@ public class EdgeOrbitState : VisualState
         orbitAxes.Clear();
         orbitDirections.Clear();
         orbitSpeedMultipliers.Clear();
+        
+        controller.centerRepelForce = arrivalCenterRepelForce;
+        controller.orbitGravity = arrivalOrbitGravity;
     }
+
+    public override void ApplySignals(InteractionSignals signals)
+    {
+        float gravity = 2 * controller.handDistanceCurve.Evaluate(signals.HandDistance) - 1;
+        controller.centerRepelForce = arrivalCenterRepelForce + gravity * controller.handDistanceMultiplier;
+        controller.orbitGravity = arrivalOrbitGravity + gravity;
+    }
+    
 
     //void NotUsed()
     //{

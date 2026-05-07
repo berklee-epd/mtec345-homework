@@ -17354,10 +17354,7 @@ MonoBehaviour:
   gestures:
   - {fileID: 11400000, guid: 31ae2ee988f14466184e8c0d92090d07, type: 2}
   - {fileID: 11400000, guid: f41efc6f3bd884011b3c27c4f0129f8b, type: 2}
-  - {fileID: 11400000, guid: cbbfe1bd2e2d54779ba8665d0da003cb, type: 2}
-  - {fileID: 11400000, guid: 48e2d0f9315fb452c8ad7b821888e15f, type: 2}
-  - {fileID: 11400000, guid: 1cd43f0c126fb4c5e896f3b08d46e1ec, type: 2}
-  - {fileID: 11400000, guid: 4055abece3a9d4d2fa1994c5340fd19b, type: 2}
+  movementEnergyMultiplier: 10
 --- !u!4 &483373777
 Transform:
   m_ObjectHideFlags: 0
@@ -17458,7 +17455,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1037160126}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81c676496b8d04c889ee80dc07f23cb5, type: 3}
   m_Name: 
@@ -37477,11 +37474,36 @@ MonoBehaviour:
   minOrbitVelocity: 0.2
   maxOrbitVelocity: 10
   orbitGravity: 5
+  handDistanceCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0
+      value: -0.000061260536
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 500.00684
+      value: 1.0050712
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   idleGravity: 5
   centerRepelRadius: 17.13
   centerRepelForce: 8.2
   centerRepelFalloff: 2.2
   centerRepelReferenceDepth: 7.6
+  handDistanceMultiplier: 600
   friction: 0.98
 --- !u!4 &1037160128
 Transform:
@@ -37758,7 +37780,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4790591542062550009, guid: c712748a1f7074be5927b30c402bec2a, type: 3}
       propertyPath: modelFileName
-      value: model050626_02
+      value: model050626_03
       objectReference: {fileID: 0}
     - target: {fileID: 4790591542062550009, guid: c712748a1f7074be5927b30c402bec2a, type: 3}
       propertyPath: loadModelOnStart
@@ -37975,7 +37997,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1968701995}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

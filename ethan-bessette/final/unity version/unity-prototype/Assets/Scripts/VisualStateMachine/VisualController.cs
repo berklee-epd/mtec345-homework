@@ -32,6 +32,7 @@ public class VisualController : MonoBehaviour
     public float minOrbitVelocity = 1f;
     public float maxOrbitVelocity = 5f;
     public float orbitGravity = 5f;
+    public AnimationCurve handDistanceCurve;
 
     [Header("Idle Settings")]
     public float idleGravity = 5f;
@@ -41,6 +42,7 @@ public class VisualController : MonoBehaviour
     public float centerRepelForce = 12f;
     public float centerRepelFalloff = 2f;
     public float centerRepelReferenceDepth = 10f;
+    public float handDistanceMultiplier = 600f;
 
     [Header("Smooth Motion Settings")]
     [SerializeField] private float friction = 0.98f; // Higher friction for smoother, floating motion
@@ -155,6 +157,13 @@ public class VisualController : MonoBehaviour
     public void ApplySignals(InteractionSignals signals)
     {
         if (signals == null) return;
+        currentState?.ApplySignals(signals);
+        CheckSwitchState(signals);
+    }
+
+    private void ApplySignalsUnused(InteractionSignals signals)
+    {
+        if (signals == null) return;
 
         Camera cam = Camera.main;
         if (cam == null) return;
@@ -247,8 +256,12 @@ public class VisualController : MonoBehaviour
         }
     }
 
-    public void ApplyVisualModifiers(InteractionSignals signals)
+    void CheckSwitchState(InteractionSignals signals)   
     {
-        ApplySignals(signals);
+        if (signals.GestureChanged)
+        {
+            if (signals.GestureIndex == 0) ChangeState(Idle);
+            else if (signals.GestureIndex == 1) ChangeState(EdgeOrbit);
+        }
     }
 }

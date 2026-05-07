@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6372455017733588402}
   - component: {fileID: 5056224097484892417}
   - component: {fileID: 3999212289830685236}
+  - component: {fileID: 5037791869154342208}
   m_Layer: 0
   m_Name: VisualObject
   m_TagString: Untagged
@@ -102,7 +103,7 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -130,3 +131,30 @@ MonoBehaviour:
   useBounds: 0
   wrapBounds: 0
   clampBounds: 1
+--- !u!54 &5037791869154342208
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290001281609630743}
+  serializedVersion: 5
+  m_Mass: 4.01
+  m_LinearDamping: 2.2
+  m_AngularDamping: 2.87
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
