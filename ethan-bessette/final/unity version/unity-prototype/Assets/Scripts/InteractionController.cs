@@ -152,12 +152,12 @@ public class InteractionController : MonoBehaviour
             signals.HandHeight = rightWrist.y;
         }
 
-        if (Time.frameCount % 10 == 0)
-        {
-            Debug.Log($"[InteractionController] Pose signals updated: " +
-                      $" Hand distance: {signals.HandDistance}" +
-                      $"Movement Energy: {signals.MovementEnergy}");
-        }
+        //if (Time.frameCount % 10 == 0)
+        //{
+        //    Debug.Log($"[InteractionController] Pose signals updated: " +
+        //              $" Hand distance: {signals.HandDistance}" +
+        //              $"Movement Energy: {signals.MovementEnergy}");
+        //}
     }
 
     private Vector2 GetKeypointPosition(DetectLandmarks.Pose pose, DetectLandmarks.Keypoint keypoint)
