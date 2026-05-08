@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyre/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# uv / packaging
+dist/
+build/
+*.egg-info/
+
+# Local data and model artifacts
+data/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
+# Generated MIDI / token outputs
+generated*.mid
+generated*.midi
+continued*.mid
+continued*.midi
+output*.mid
+output*.midi
+tokens*.json
+tokenizer*.json
+
+# Temporary files
+tmp*/
+*.tmp
+*.log
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
